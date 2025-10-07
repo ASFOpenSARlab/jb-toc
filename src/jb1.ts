@@ -1,12 +1,8 @@
-import * as path from 'path';
+// import * as path from 'path';
 import * as yaml from 'js-yaml';
-import { getJupyterAppInstance } from './index';
+// import { getJupyterAppInstance } from './index';
 
 import * as jbtoc from './jbtoc';
-
-interface IFileMetadata {
-  path: string;
-}
 
 interface IJbookConfig {
   title: string;
@@ -31,67 +27,6 @@ interface ISection {
 interface IPart {
   caption: string;
   chapters: ISection[];
-}
-
-interface INotebook {
-  cells: ICell[];
-}
-
-interface ICell {
-  cell_type: 'markdown';
-  metadata: { object: any };
-  source: string;
-}
-
-function isNotebook(obj: any): obj is INotebook {
-  return obj && typeof obj === 'object' && Array.isArray(obj.cells);
-}
-
-async function getTitle(filePath: string): Promise<string | null> {
-  const suffix = path.extname(filePath);
-  if (suffix === '.ipynb') {
-    try {
-      const jsonData: INotebook | string = await jbtoc.getFileContents(filePath);
-      if (isNotebook(jsonData)) {
-        const headerCells = jsonData.cells.filter(cell => {
-          if (cell.cell_type === 'markdown') {
-            const source = Array.isArray(cell.source)
-              ? cell.source.join('')
-              : cell.source;
-            return source.split('\n').some(line => line.startsWith('# '));
-          }
-          return false;
-        });
-
-        const firstHeaderCell = headerCells.length > 0 ? headerCells[0] : null;
-        if (firstHeaderCell) {
-          if (firstHeaderCell.source.split('\n')[0].slice(0, 2) === '# ') {
-            const title: string = firstHeaderCell.source
-              .split('\n')[0]
-              .slice(2);
-            return title;
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error reading or parsing notebook:', error);
-    }
-  } else if (suffix === '.md') {
-    try {
-      const md: INotebook | string = await jbtoc.getFileContents(filePath);
-      if (!isNotebook(md)) {
-        const lines: string[] = md.split('\n');
-        for (const line of lines) {
-          if (line.slice(0, 2) === '# ') {
-            return line.slice(2);
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error reading or parsing Markdown:', error);
-    }
-  }
-  return null;
 }
 
 function isIJbookConfig(obj: any): obj is IJbookConfig {
@@ -119,40 +54,6 @@ export async function getBookConfig(
   return { title: null, author: null };
 }
 
-
-async function globFiles(pattern: string): Promise<string[]> {
-  const baseDir = '';
-  const result: string[] = [];
-
-  try {
-    const app = getJupyterAppInstance();
-    const data = await app.serviceManager.contents.get(baseDir, {
-      content: true
-    });
-    const regex = new RegExp(pattern);
-    for (const item of data.content) {
-      if (item.type === 'file' && regex.test(item.path)) {
-        result.push(item.path);
-      }
-    }
-  } catch (error) {
-    console.error(`Error globbing pattern ${pattern}`, error);
-  }
-
-  return result;
-}
-
-async function getFullPath(file_pattern: string, dir_pth: string) {
-  const files = await jbtoc.ls(dir_pth);
-  for (const value of Object.values(files.content)) {
-    const file = value as IFileMetadata;
-    if (file.path.includes(file_pattern)) {
-      return file.path;
-    }
-  }
-  return `Unable to locate ${file_pattern} in ${dir_pth}`;
-}
-
 async function getSubSection(
   parts: ISection[],
   cwd: string,
@@ -167,8 +68,8 @@ async function getSubSection(
     const parts = file.split('/');
     parts.pop();
     const k_dir = parts.join('/');
-    const pth = await getFullPath(file, `${cwd}${k_dir}`);
-    let title = await getTitle(pth);
+    const pth = await jbtoc.getFullPath(file, `${cwd}${k_dir}`);
+    let title = await jbtoc.getTitle(pth);
     if (!title) {
       title = file;
     }
@@ -179,8 +80,8 @@ async function getSubSection(
       const parts = k.file.split('/');
       parts.pop();
       const k_dir = parts.join('/');
-      const pth = await getFullPath(k.file, `${cwd}${k_dir}`);
-      let title = await getTitle(pth);
+      const pth = await jbtoc.getFullPath(k.file, `${cwd}${k_dir}`);
+      let title = await jbtoc.getTitle(pth);
       if (!title) {
         title = k.file;
       }
@@ -205,7 +106,7 @@ async function getSubSection(
     } else if (k.url) {
       html += `<button class="jp-Button toc-button tb-level${level}" style="display:block;"><a class="toc-link tb-level${level}" href="${k.url}" target="_blank" rel="noopener noreferrer" style="display: block;">${k.title}</a></button>`;
     } else if (k.glob) {
-      const files = await globFiles(`${cwd}${k.glob}`);
+      const files = await jbtoc.globFiles(`${cwd}${k.glob}`);
       for (const file of files) {
         const relative = file.replace(`${cwd}`, '');
         await insert_one_file(relative);

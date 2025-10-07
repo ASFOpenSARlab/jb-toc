@@ -1,12 +1,23 @@
-// import * as path from 'path';
+import * as path from 'path';
 import * as yaml from 'js-yaml';
 import { getJupyterAppInstance } from './index';
 
 import * as jb1 from './jb1';
 import * as jb2 from './jb2';
+// import { PassThrough } from 'stream';
 
 interface IFileMetadata {
   path: string;
+}
+
+interface INotebook {
+  cells: ICell[];
+}
+
+interface ICell {
+  cell_type: 'markdown';
+  metadata: { object: any };
+  source: string;
 }
 
 export async function getFileContents(path: string): Promise<string> {
@@ -64,6 +75,90 @@ async function findConfigInParents(cwd: string): Promise<string | null> {
   return null;
 }
 
+export async function getFullPath(file_pattern: string, dir_pth: string) {
+  const files = await ls(dir_pth);
+  for (const value of Object.values(files.content)) {
+    const file = value as IFileMetadata;
+    if (file.path.includes(file_pattern)) {
+      return file.path;
+    }
+  }
+  return `Unable to locate ${file_pattern} in ${dir_pth}`;
+}
+
+function isNotebook(obj: any): obj is INotebook {
+  return obj && typeof obj === 'object' && Array.isArray(obj.cells);
+}
+
+export async function getTitle(filePath: string): Promise<string | null> {
+  const suffix = path.extname(filePath);
+  if (suffix === '.ipynb') {
+    try {
+      const jsonData: INotebook | string = await getFileContents(filePath);
+      if (isNotebook(jsonData)) {
+        const headerCells = jsonData.cells.filter(cell => {
+          if (cell.cell_type === 'markdown') {
+            const source = Array.isArray(cell.source)
+              ? cell.source.join('')
+              : cell.source;
+            return source.split('\n').some(line => line.startsWith('# '));
+          }
+          return false;
+        });
+
+        const firstHeaderCell = headerCells.length > 0 ? headerCells[0] : null;
+        if (firstHeaderCell) {
+          if (firstHeaderCell.source.split('\n')[0].slice(0, 2) === '# ') {
+            const title: string = firstHeaderCell.source
+              .split('\n')[0]
+              .slice(2);
+            return title;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error reading or parsing notebook:', error);
+    }
+  } else if (suffix === '.md') {
+    try {
+      const md: INotebook | string = await getFileContents(filePath);
+      if (!isNotebook(md)) {
+        const lines: string[] = md.split('\n');
+        for (const line of lines) {
+          if (line.slice(0, 2) === '# ') {
+            return line.slice(2);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error reading or parsing Markdown:', error);
+    }
+  }
+  return null;
+}
+
+export async function globFiles(pattern: string): Promise<string[]> {
+  const baseDir = '';
+  const result: string[] = [];
+
+  try {
+    const app = getJupyterAppInstance();
+    const data = await app.serviceManager.contents.get(baseDir, {
+      content: true
+    });
+    const regex = new RegExp(pattern);
+    for (const item of data.content) {
+      if (item.type === 'file' && regex.test(item.path)) {
+        result.push(item.path);
+      }
+    }
+  } catch (error) {
+    console.error(`Error globbing pattern ${pattern}`, error);
+  }
+
+  return result;
+}
+
 export async function getTOC(cwd: string): Promise<string> {
   const tocPath = await findConfigInParents(cwd);
   let configPath = null;
@@ -112,24 +207,70 @@ export async function getTOC(cwd: string): Promise<string> {
         console.error('Error reading or parsing _toc.yml:', error);
       }
     }
-    else if (myst) {
+    else if (
+      myst &&
+      configParent !== null &&
+      configParent !== undefined
+    ) {
       try {
         const mystYAMLStr = await getFileContents(tocPath);
         if (typeof mystYAMLStr === 'string') {
           const mystYaml: unknown = yaml.load(mystYAMLStr);
           const yml = mystYaml as jb2.IMyst;
           const project = yml.project as jb2.IMystProject;
-          const toc = project.toc as jb2.IMystTOC;
 
-          console.log(project);
-          console.log(toc);
+          let html = `<div class="jbook-toc" data-toc-dir="${configParent}">`;
+
+          if (project.title) {
+            html += `<p id="toc-title">${project.title}</p>`;
+          }
+          if (project.subtitle) {
+            html += `<p id="toc-subtitle">${project.subtitle}</p>`
+          }
+          if (project.short_title) {
+            {}
+          }
+          if (project.description) {
+            {}
+          }
+          if (project.authors) {
+            // html += `<p id="toc-author">Author: ${project.authors}</p>`
+            {}
+          }
+          if (project.reviewers) {
+            {}
+          }
+          if (project.editors) {
+            {}
+          }
+          if (project.affliliations) {
+            {}
+          }
+          if (project.license) {
+            {}
+          }
+          if (project.copyright) {
+            {}
+          }
+          if (project.doi) {
+            {}
+          }
+          if (project.github) {
+            {}
+          }
+          if (project.social) {
+            {}
+          }
+          if (project.downloads) {
+            {}
+          }
+
           const toc_html = await jb2.mystTOCToHtml(project, configParent);
           console.log(toc_html)
-          // return `
-          //   <div class="jbook-toc" data-toc-dir="${configParent}"><p id="toc-title">${config.title}</p>
-          //   <p id="toc-author">Author: ${config.author}</p>
-          //   ${toc_html} </div>
-          //     `;
+          return `
+            ${html}
+            ${toc_html} </div>
+              `;
         } else {
           console.error('Error: Misconfigured Jupyter Book _toc.yml.');
         }
