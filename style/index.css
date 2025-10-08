@@ -23,6 +23,18 @@
   color: var(--jp-layout-color3);
 }
 
+.jp-GitHubLink {
+  display: flex;
+  align-items: center;
+  color: var(--jp-ui-font-color1);
+  text-decoration: none;
+  padding-left: 15px;
+}
+
+.jp-GitHubLink:hover {
+  color: var(--jp-content-link-color);
+}
+
 .tb-level1 {
   padding-left: 12px;
 }
@@ -47,6 +59,14 @@
   display: none;
 }
 
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  padding-left: 15px;
+}
+
 #toc-title {
   font-size: var(--jp-ui-font-size2);
   font-weight: bold;
@@ -59,6 +79,18 @@
   font-weight: bold;
   color: var(--jp-ui-font-color2);
   padding-left: 15px;
+}
+
+#toc-subtitle {
+  font-style: italic;
+  padding-left: 15px;
+}
+
+.toc-hr {
+  width: calc(100% - 30px);
+  margin: 0 auto;
+  border: none;
+  border-top: 2px solid var(--jp-layout-color3);
 }
 
 div.lm-Widget[id='@jupyterlab-sidepanel/jupyterbook-toc'] {

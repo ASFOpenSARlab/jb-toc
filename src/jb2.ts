@@ -13,7 +13,7 @@ export interface IMystProject {
   short_title?: string;
   description?: string;
   downloads?: IMystDownload[];
-  authors?: string[];
+  authors?: IMystAuthors[];
   reviewers?: string[];
   editors?: string[];
   affliliations?: string[];
@@ -25,7 +25,9 @@ export interface IMystProject {
   toc: IMystTOC[];
 }
 
-
+interface IMystAuthors {
+    name?: string;
+}
 
 interface IMystDownload {
   file?: string;
@@ -42,7 +44,7 @@ export interface IMystTOC {
   glob?: string;
 }
 
-async function getSubSection(
+export async function mystTOCToHtml(
   toc: IMystTOC[],
   cwd: string,
   level: number = 1,
@@ -63,8 +65,12 @@ async function getSubSection(
     }
     if (chevron) {
       html += `
-        <div>
-            <button class="jp-Button toc-button tb-level${level}"style="display: inline-block;" data-file-path="${pth}">${title}</button>
+        <div style="display: flex; align-items: center;">
+            <button class="jp-Button toc-button tb-level${level}"
+                    style="display: inline-block; font-weight: bold"
+                    data-file-path="${pth}">
+              ${title}
+            </button>
             <button class="jp-Button toc-chevron" style="display: inline-block;"><i class="fa fa-chevron-down "></i></button>
         </div>
         <div style="display: none;">
@@ -78,7 +84,7 @@ async function getSubSection(
   async function insert_title(title: string) {
 
     html += `
-    <div style="display: flex; align-items: center; justify-content: space-between;">
+    <div style="display: flex; align-items: center;">
         <p class="caption tb-level${level}" role="heading" style="margin: 0;">
         <span class="caption-text"><b>${title}</b></span></p>
         <button class="jp-Button toc-chevron" style="display: inline-block;"><i class="fa fa-chevron-down "></i></button>
@@ -90,7 +96,7 @@ async function getSubSection(
   for (const item of toc) {
     console.log(item);
     if (item.title && item.children) {
-      // If there are a title, children, and a file, use the file as the title   
+      // If there are a title, children, and a file, use the file path as the title   
       if (item.file) {
         await insert_one_file(item.file, true);
       }
@@ -98,7 +104,7 @@ async function getSubSection(
         insert_title(item.title);
       }
       const html_cur = html;
-      html = await getSubSection(
+      html = await mystTOCToHtml(
         item.children,
         cwd,
         (level = level + 1),
@@ -118,37 +124,5 @@ async function getSubSection(
       }
     }
   }
-  return html;
-}
-
-export async function mystTOCToHtml(project: IMystProject, cwd: string): Promise<string> {
-  let html = '\n<ul>';
-
-//   for (const item of project.toc) {
-//     console.log(item);
-//     if (item.title) {
-//         // html += `\n<p class="caption" role="heading"><span class="caption-text"><b>\n${item.title}\n</b></span>\n</p>`;
-//         console.log(item.title);
-//     }
-//     if (item.children) {
-//         console.log(item.children);
-//     }
-//   }
-  const subISectionHtml = await getSubSection(project.toc, cwd);
-  html += `\n${subISectionHtml}`;
-
-//   if (toc.parts) {
-//     for (const chapter of toc.parts) {
-//       html += `\n<p class="caption" role="heading"><span class="caption-text"><b>\n${chapter.caption}\n</b></span>\n</p>`;
-//       const subISectionHtml = await getSubSection(chapter.chapters, cwd);
-//       html += `\n${subISectionHtml}`;
-//     }
-//   } else {
-//     if (toc.chapters) {
-//       const subISectionHtml = await getSubSection(toc.chapters, cwd);
-//       html += `\n${subISectionHtml}`;
-//     }
-//   }
-//   html += '\n</ul>';
   return html;
 }

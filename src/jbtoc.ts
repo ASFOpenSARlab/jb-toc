@@ -219,58 +219,89 @@ export async function getTOC(cwd: string): Promise<string> {
           const yml = mystYaml as jb2.IMyst;
           const project = yml.project as jb2.IMystProject;
 
-          let html = `<div class="jbook-toc" data-toc-dir="${configParent}">`;
+          let html_top = `<div class="jbook-toc" data-toc-dir="${configParent}">`;
 
           if (project.title) {
-            html += `<p id="toc-title">${project.title}</p>`;
+            html_top += `<p id="toc-title">${project.title}</p>`;
           }
           if (project.subtitle) {
-            html += `<p id="toc-subtitle">${project.subtitle}</p>`
-          }
-          if (project.short_title) {
-            {}
-          }
-          if (project.description) {
-            {}
+            html_top += `<p id="toc-subtitle">${project.subtitle}</p>`
           }
           if (project.authors) {
-            // html += `<p id="toc-author">Author: ${project.authors}</p>`
-            {}
+            const authors = project.authors;
+            if (authors.length == 1) {
+              html_top += `<p id="toc-author">Author: `
+            } else {
+              html_top += `<p id="toc-author">Authors: `
+            }
+            authors.forEach((author, i) => {
+              if (i < authors.length - 1) {
+                html_top += `${author.name}, `
+              } else {
+                html_top += `${author.name}`
+              }
+            });
+            html_top += `</p>`
           }
-          if (project.reviewers) {
-            {}
-          }
-          if (project.editors) {
-            {}
-          }
-          if (project.affliliations) {
-            {}
-          }
-          if (project.license) {
-            {}
-          }
-          if (project.copyright) {
-            {}
-          }
-          if (project.doi) {
-            {}
+          if (project.github || project.license || project.doi) {
+            html_top += `<div class=badges>`
           }
           if (project.github) {
-            {}
+            html_top += `
+              <a href="https://github.com/${project.github}" target="_blank" rel="noopener">
+                <img
+                  src="https://img.shields.io/badge/GitHub-5c5c5c?logo=github"
+                  alt="GitHub: ${project.github}"
+                >
+              </a>
+            `
           }
-          if (project.social) {
-            {}
+          if (project.license) {
+            html_top +=`
+            <a href="https://opensource.org/licenses/${project.license}" target="_blank" rel="noopener">
+              <img
+                src="https://img.shields.io/badge/License-${project.license.replaceAll("-", "_")}--Clause-blue.svg"
+                alt="License: ${project.license}"
+              >
+            </a>
+            `
           }
+          if (project.doi) {
+            html_top += `
+              <a href="https://doi.org/10.5281/zenodo.${project.doi}" target="_blank" rel="noopener">
+                <img
+                  src="https://img.shields.io/badge/DOI-10.5281%2Fzenodo.${project.doi}-blue.svg"
+                  alt="DOI: 10.5281/zenodo.${project.doi}"
+                >
+              </a>
+            `
+          }
+          if (project.github || project.license || project.doi) {
+            html_top += `</div>`
+          }
+          html_top += `<br><hr class=toc-hr>`
+
+          let toc_html = await jb2.mystTOCToHtml(project.toc, configParent);
+
           if (project.downloads) {
             {}
           }
 
-          const toc_html = await jb2.mystTOCToHtml(project, configParent);
-          console.log(toc_html)
+          let html_bottom = `<br><hr class=toc-hr>`
+
+          if (project.copyright) {
+            html_bottom += `
+              <p style="padding-left: 15px">Copyright © ${project.copyright}</p>
+            `
+          }
+
           return `
-            ${html}
-            ${toc_html} </div>
+            ${html_top}
+            <ul>${toc_html}</ul>
+            ${html_bottom}
+            </div>
               `;
+
         } else {
           console.error('Error: Misconfigured Jupyter Book _toc.yml.');
         }
