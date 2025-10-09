@@ -1,20 +1,21 @@
 import * as path from 'path';
 import * as yaml from 'js-yaml';
 import { getJupyterAppInstance } from './index';
+import prettier from 'prettier';
+import parserHtml from 'prettier/plugins/html';
 
 import * as jb1 from './jb1';
 import * as jb2 from './jb2';
-// import { PassThrough } from 'stream';
 
-interface IFileMetadata {
+interface FileMetadata {
   path: string;
 }
 
-interface INotebook {
-  cells: ICell[];
+interface Notebook {
+  cells: Cell[];
 }
 
-interface ICell {
+interface Cell {
   cell_type: 'markdown';
   metadata: { object: any };
   source: string;
@@ -59,7 +60,7 @@ async function findConfigInParents(cwd: string): Promise<string | null> {
       const pth = dirs.join('/');
       const files = await ls(pth);
       for (const value of Object.values(files.content)) {
-        const file = value as IFileMetadata;
+        const file = value as FileMetadata;
         if (file.path.includes(configPattern)) {
           return file.path;
         }
@@ -71,14 +72,14 @@ async function findConfigInParents(cwd: string): Promise<string | null> {
       }
     }
   }
-  
+
   return null;
 }
 
 export async function getFullPath(file_pattern: string, dir_pth: string) {
   const files = await ls(dir_pth);
   for (const value of Object.values(files.content)) {
-    const file = value as IFileMetadata;
+    const file = value as FileMetadata;
     if (file.path.includes(file_pattern)) {
       return file.path;
     }
@@ -86,15 +87,17 @@ export async function getFullPath(file_pattern: string, dir_pth: string) {
   return `Unable to locate ${file_pattern} in ${dir_pth}`;
 }
 
-function isNotebook(obj: any): obj is INotebook {
+function isNotebook(obj: any): obj is Notebook {
   return obj && typeof obj === 'object' && Array.isArray(obj.cells);
 }
 
-export async function getTitle(filePath: string): Promise<string | null> {
+export async function getFileTitleFromHeader(
+  filePath: string
+): Promise<string | null> {
   const suffix = path.extname(filePath);
   if (suffix === '.ipynb') {
     try {
-      const jsonData: INotebook | string = await getFileContents(filePath);
+      const jsonData: Notebook | string = await getFileContents(filePath);
       if (isNotebook(jsonData)) {
         const headerCells = jsonData.cells.filter(cell => {
           if (cell.cell_type === 'markdown') {
@@ -121,7 +124,7 @@ export async function getTitle(filePath: string): Promise<string | null> {
     }
   } else if (suffix === '.md') {
     try {
-      const md: INotebook | string = await getFileContents(filePath);
+      const md: Notebook | string = await getFileContents(filePath);
       if (!isNotebook(md)) {
         const lines: string[] = md.split('\n');
         for (const line of lines) {
@@ -163,18 +166,19 @@ export async function getTOC(cwd: string): Promise<string> {
   const tocPath = await findConfigInParents(cwd);
   let configPath = null;
   let configParent = null;
+  let html;
   if (tocPath) {
-    const myst = tocPath.includes("myst")
+    const myst = tocPath.includes('myst');
     const parts = tocPath.split('/');
 
     parts.pop();
     configParent = parts.join('/');
-    
+
     if (!myst) {
       const files = await ls(configParent);
       const configPattern = '_config.yml';
       for (const value of Object.values(files.content)) {
-        const file = value as IFileMetadata;
+        const file = value as FileMetadata;
         if (file.path.includes(configPattern)) {
           configPath = file.path;
           break;
@@ -192,61 +196,66 @@ export async function getTOC(cwd: string): Promise<string> {
         const tocYamlStr = await getFileContents(tocPath);
         if (typeof tocYamlStr === 'string') {
           const tocYaml: unknown = yaml.load(tocYamlStr);
-          const toc = tocYaml as jb1.IToc;
-          const config = await jb1.getBookConfig(configPath);
-          const toc_html = await jb1.tocToHtml(toc, configParent);
-          return `
-            <div class="jbook-toc" data-toc-dir="${configParent}"><p id="toc-title">${config.title}</p>
+          const toc = tocYaml as jb1.JBook1TOC;
+          const config = await jb1.getJBook1Config(configPath);
+          const toc_html = await jb1.jBook1TOCToHtml(toc, configParent);
+          html = `
+          <div class="jbook-toc" data-toc-dir="${configParent}">
+            <p id="toc-title">${config.title}</p>
             <p id="toc-author">Author: ${config.author}</p>
-            ${toc_html} </div>
-              `;
+            ${toc_html}
+          </div>
+          `;
         } else {
           console.error('Error: Misconfigured Jupyter Book _toc.yml.');
         }
       } catch (error) {
         console.error('Error reading or parsing _toc.yml:', error);
       }
-    }
-    else if (
-      myst &&
-      configParent !== null &&
-      configParent !== undefined
-    ) {
+    } else if (myst && configParent !== null && configParent !== undefined) {
       try {
         const mystYAMLStr = await getFileContents(tocPath);
         if (typeof mystYAMLStr === 'string') {
           const mystYaml: unknown = yaml.load(mystYAMLStr);
-          const yml = mystYaml as jb2.IMyst;
-          const project = yml.project as jb2.IMystProject;
+          const yml = mystYaml as jb2.Myst;
+          const project = yml.project as jb2.MystProject;
 
           const html_top = await jb2.getHtmlTop(project, configParent);
           const toc_html = await jb2.mystTOCToHtml(project.toc, configParent);
-          const html_bottom = await jb2.getHtmlBottom(project)
+          const html_bottom = await jb2.getHtmlBottom(project);
 
           if (project.downloads) {
-            {}
+            {
+            }
           }
-
-          return `
+          html = `
             ${html_top}
             <ul>${toc_html}</ul>
             </div>
             ${html_bottom}
-              `;
-
+            `;
         } else {
           console.error('Error: Misconfigured Jupyter Book _toc.yml.');
         }
       } catch (error) {
         console.error('Error reading or parsing _toc.yml:', error);
       }
-
     }
   }
-  return `
-    <p id="toc-title">Not a Jupyter-Book</p>
-    <p id="toc-author">"_toc.yml" and/or "_config.yml" not found in or above:</p>
-    <p id="toc-author">${cwd}</p>
-    <p id="toc-author">Please navigate to a directory containing a Jupyter-Book to view its Table of Contents</p>
-    `;
+
+  if (typeof html == 'string') {
+    const formatted_html = await prettier.format(html, {
+      parser: 'html',
+      plugins: [parserHtml]
+    });
+    console.log(formatted_html);
+    return formatted_html;
+  } else {
+    return `
+      <p id="toc-title">Not a Jupyter-Book</p>
+      <p id="toc-author">Could not find a "_toc.yml", "_config.yml", or "myst.yml in or above the current directory:</p>
+      <p id="toc-author">${cwd}</p>
+      <p id="toc-author">Please navigate to a Jupyter-Book directory to view its Table of Contents</p>
+      `;
+  }
 }

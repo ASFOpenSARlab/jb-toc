@@ -1,51 +1,41 @@
-// import * as path from 'path';
-// import * as yaml from 'js-yaml';
-// import { getJupyterAppInstance } from './index';
-
 import * as jbtoc from './jbtoc';
-export interface IMyst {
-  project?: IMystProject;
+export interface Myst {
+  project?: MystProject;
 }
 
-export interface IMystProject {
+export interface MystProject {
   title?: string;
   subtitle?: string;
-  short_title?: string;
-  description?: string;
-  downloads?: IMystDownload[];
-  authors?: IMystAuthors[];
-  reviewers?: string[];
-  editors?: string[];
-  affliliations?: string[];
+  downloads?: MystDownload[];
+  authors?: MystAuthors[];
   doi?: string;
   github?: string;
   license?: string;
   copyright?: string;
-  social?: string
-  toc: IMystTOC[];
+  toc: MystTOC[];
 }
 
-interface IMystAuthors {
-    name?: string;
+interface MystAuthors {
+  name?: string;
 }
 
-interface IMystDownload {
+interface MystDownload {
   file?: string;
   title?: string;
   url?: string;
   filename?: string;
 }
 
-export interface IMystTOC {
+export interface MystTOC {
   file?: string;
   title?: string;
-  children?: IMystTOC[];
+  children?: MystTOC[];
   url?: string;
   glob?: string;
 }
 
 export async function mystTOCToHtml(
-  toc: IMystTOC[],
+  toc: MystTOC[],
   cwd: string,
   level: number = 1,
   html: string = ''
@@ -54,12 +44,12 @@ export async function mystTOCToHtml(
     cwd = cwd + '/';
   }
 
-  async function insert_one_file(file: string, chevron: boolean=false) {
+  async function insertFile(file: string, chevron: boolean = false) {
     const parts = file.split('/');
     parts.pop();
     const k_dir = parts.join('/');
     const pth = await jbtoc.getFullPath(file, `${cwd}${k_dir}`);
-    let title = await jbtoc.getTitle(pth);
+    let title = await jbtoc.getFileTitleFromHeader(pth);
     if (!title) {
       title = file;
     }
@@ -75,14 +65,12 @@ export async function mystTOCToHtml(
         </div>
         <div style="display: none;">
         `;
-    }
-    else {
+    } else {
       html += `<button class="jp-Button toc-button tb-level${level}" style="display: block;" data-file-path="${pth}">${title}</button>`;
     }
   }
 
-  async function insert_title(title: string) {
-
+  async function insertMystTitle(title: string) {
     html += `
     <div style="display: flex; align-items: center;">
         <p class="caption tb-level${level}" role="heading" style="margin: 0;">
@@ -96,13 +84,11 @@ export async function mystTOCToHtml(
   for (const item of toc) {
     console.log(item);
     if ((item.title || item.file) && item.children) {
-      
-      // If there are a title, children, and a file, use the file path as the title   
+      // If there are a title, children, and a file, use the file path as the title
       if (item.file) {
-        await insert_one_file(item.file, true);
-      }
-      else if (item.title){
-        insert_title(item.title);
+        await insertFile(item.file, true);
+      } else if (item.title) {
+        insertMystTitle(item.title);
       }
       const html_cur = html;
       html = await mystTOCToHtml(
@@ -114,14 +100,14 @@ export async function mystTOCToHtml(
       level = level - 1;
       html += '</div>';
     } else if (item.file) {
-       await insert_one_file(item.file); 
+      await insertFile(item.file);
     } else if (item.url) {
       html += `<button class="jp-Button toc-button tb-level${level}" style="display:block;"><a class="toc-link tb-level${level}" href="${item.url}" target="_blank" rel="noopener noreferrer" style="display: block;">${item.title}</a></button>`;
     } else if (item.glob) {
       const files = await jbtoc.globFiles(`${cwd}${item.glob}`);
       for (const file of files) {
         const relative = file.replace(`${cwd}`, '');
-        await insert_one_file(relative);
+        await insertFile(relative);
       }
     }
   }
@@ -129,8 +115,8 @@ export async function mystTOCToHtml(
 }
 
 export async function getHtmlTop(
-  project: IMystProject,
-  configParent: string,
+  project: MystProject,
+  configParent: string
 ): Promise<string> {
   let html_top = `<div class="jbook-toc" data-toc-dir="${configParent}">`;
 
@@ -138,36 +124,34 @@ export async function getHtmlTop(
     html_top += `<p id="toc-title">${project.title}</p>`;
   }
   if (project.subtitle) {
-    html_top += `<p id="toc-subtitle">${project.subtitle}</p>`
+    html_top += `<p id="toc-subtitle">${project.subtitle}</p>`;
   }
-  html_top += `<br><hr class=toc-hr>`
+  html_top += `<br><hr class=toc-hr>`;
   return html_top;
 }
 
-export async function getHtmlBottom(
-  project: IMystProject
-): Promise<string> {
-  let html_bottom = `<br><hr class=toc-hr><br>`
+export async function getHtmlBottom(project: MystProject): Promise<string> {
+  let html_bottom = `<br><hr class=toc-hr><br>`;
 
-   if (project.authors) {
+  if (project.authors) {
     const authors = project.authors;
     if (authors.length == 1) {
-      html_bottom += `<p id="toc-author">Author: `
+      html_bottom += `<p id="toc-author">Author: `;
     } else {
-      html_bottom += `<p id="toc-author">Authors: `
+      html_bottom += `<p id="toc-author">Authors: `;
     }
     authors.forEach((author, i) => {
       if (i < authors.length - 1) {
-        html_bottom += `${author.name}, `
+        html_bottom += `${author.name}, `;
       } else {
-        html_bottom += `${author.name}`
+        html_bottom += `${author.name}`;
       }
     });
-    html_bottom += `</p>`
+    html_bottom += `</p>`;
   }
 
   if (project.github || project.license || project.doi) {
-    html_bottom += `<div class=badges>`
+    html_bottom += `<div class=badges>`;
   }
   if (project.github) {
     html_bottom += `
@@ -177,17 +161,17 @@ export async function getHtmlBottom(
           alt="GitHub: ${project.github}"
         >
       </a>
-    `
+    `;
   }
   if (project.license) {
-    html_bottom +=`
+    html_bottom += `
     <a href="https://opensource.org/licenses/${project.license}" target="_blank" rel="noopener">
       <img
-        src="https://img.shields.io/badge/License-${project.license.replaceAll("-", "_")}--Clause-blue.svg"
+        src="https://img.shields.io/badge/License-${project.license.replaceAll('-', '_')}--Clause-blue.svg"
         alt="License: ${project.license}"
       >
     </a>
-    `
+    `;
   }
   if (project.doi) {
     html_bottom += `
@@ -197,15 +181,15 @@ export async function getHtmlBottom(
           alt="DOI: 10.5281/zenodo.${project.doi}"
         >
       </a>
-    `
+    `;
   }
   if (project.github || project.license || project.doi) {
-    html_bottom += `</div>`
+    html_bottom += `</div>`;
   }
   if (project.copyright) {
     html_bottom += `
       <p style="padding-left: 15px">Copyright © ${project.copyright}</p>
-    `
+    `;
   }
   return html_bottom;
 }

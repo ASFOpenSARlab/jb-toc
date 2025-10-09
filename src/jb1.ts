@@ -1,46 +1,44 @@
-// import * as path from 'path';
 import * as yaml from 'js-yaml';
-// import { getJupyterAppInstance } from './index';
 
 import * as jbtoc from './jbtoc';
 
-interface IJbookConfig {
+interface JBook1Config {
   title: string;
   author: string;
   logo: string;
 }
 
-export interface IToc {
-  parts?: IPart[];
-  chapters?: ISection[];
+export interface JBook1TOC {
+  parts?: Part[];
+  chapters?: Section[];
   caption?: string;
 }
 
-interface ISection {
-  sections?: ISection[];
+interface Section {
+  sections?: Section[];
   file?: string;
   url?: string;
   title?: string;
   glob?: string;
 }
 
-interface IPart {
+interface Part {
   caption: string;
-  chapters: ISection[];
+  chapters: Section[];
 }
 
-function isIJbookConfig(obj: any): obj is IJbookConfig {
+function isJBook1Config(obj: any): obj is JBook1Config {
   return obj && typeof obj === 'object' && obj.title && obj.author;
 }
 
-export async function getBookConfig(
+export async function getJBook1Config(
   configPath: string
 ): Promise<{ title: string | null; author: string | null }> {
   try {
     const yamlStr = await jbtoc.getFileContents(configPath);
     if (typeof yamlStr === 'string') {
       const config: unknown = yaml.load(yamlStr);
-      if (isIJbookConfig(config)) {
+      if (isJBook1Config(config)) {
         const title = config.title || 'Untitled Jupyter Book';
         const author = config.author || 'Anonymous';
         return { title, author };
@@ -55,7 +53,7 @@ export async function getBookConfig(
 }
 
 async function getSubSection(
-  parts: ISection[],
+  parts: Section[],
   cwd: string,
   level: number = 1,
   html: string = ''
@@ -64,12 +62,12 @@ async function getSubSection(
     cwd = cwd + '/';
   }
 
-  async function insert_one_file(file: string) {
+  async function insertFile(file: string) {
     const parts = file.split('/');
     parts.pop();
     const k_dir = parts.join('/');
     const pth = await jbtoc.getFullPath(file, `${cwd}${k_dir}`);
-    let title = await jbtoc.getTitle(pth);
+    let title = await jbtoc.getFileTitleFromHeader(pth);
     if (!title) {
       title = file;
     }
@@ -81,7 +79,7 @@ async function getSubSection(
       parts.pop();
       const k_dir = parts.join('/');
       const pth = await jbtoc.getFullPath(k.file, `${cwd}${k_dir}`);
-      let title = await jbtoc.getTitle(pth);
+      let title = await jbtoc.getFileTitleFromHeader(pth);
       if (!title) {
         title = k.file;
       }
@@ -102,32 +100,35 @@ async function getSubSection(
       level = level - 1;
       html += '</div>';
     } else if (k.file) {
-      await insert_one_file(k.file);
+      await insertFile(k.file);
     } else if (k.url) {
       html += `<button class="jp-Button toc-button tb-level${level}" style="display:block;"><a class="toc-link tb-level${level}" href="${k.url}" target="_blank" rel="noopener noreferrer" style="display: block;">${k.title}</a></button>`;
     } else if (k.glob) {
       const files = await jbtoc.globFiles(`${cwd}${k.glob}`);
       for (const file of files) {
         const relative = file.replace(`${cwd}`, '');
-        await insert_one_file(relative);
+        await insertFile(relative);
       }
     }
   }
   return html;
 }
 
-export async function tocToHtml(toc: IToc, cwd: string): Promise<string> {
+export async function jBook1TOCToHtml(
+  toc: JBook1TOC,
+  cwd: string
+): Promise<string> {
   let html = '\n<ul>';
   if (toc.parts) {
     for (const chapter of toc.parts) {
       html += `\n<p class="caption" role="heading"><span class="caption-text"><b>\n${chapter.caption}\n</b></span>\n</p>`;
-      const subISectionHtml = await getSubSection(chapter.chapters, cwd);
-      html += `\n${subISectionHtml}`;
+      const subSectionHtml = await getSubSection(chapter.chapters, cwd);
+      html += `\n${subSectionHtml}`;
     }
   } else {
     if (toc.chapters) {
-      const subISectionHtml = await getSubSection(toc.chapters, cwd);
-      html += `\n${subISectionHtml}`;
+      const subSectionHtml = await getSubSection(toc.chapters, cwd);
+      html += `\n${subSectionHtml}`;
     }
   }
   html += '\n</ul>';
