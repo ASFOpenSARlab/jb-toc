@@ -95,12 +95,13 @@ export async function mystTOCToHtml(
 
   for (const item of toc) {
     console.log(item);
-    if (item.title && item.children) {
+    if ((item.title || item.file) && item.children) {
+      
       // If there are a title, children, and a file, use the file path as the title   
       if (item.file) {
         await insert_one_file(item.file, true);
       }
-      else {
+      else if (item.title){
         insert_title(item.title);
       }
       const html_cur = html;
