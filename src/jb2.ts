@@ -139,58 +139,6 @@ export async function getHtmlTop(
   if (project.subtitle) {
     html_top += `<p id="toc-subtitle">${project.subtitle}</p>`
   }
-  if (project.authors) {
-    const authors = project.authors;
-    if (authors.length == 1) {
-      html_top += `<p id="toc-author">Author: `
-    } else {
-      html_top += `<p id="toc-author">Authors: `
-    }
-    authors.forEach((author, i) => {
-      if (i < authors.length - 1) {
-        html_top += `${author.name}, `
-      } else {
-        html_top += `${author.name}`
-      }
-    });
-    html_top += `</p>`
-  }
-  // if (project.github || project.license || project.doi) {
-  //   html_top += `<div class=badges>`
-  // }
-  // if (project.github) {
-  //   html_top += `
-  //     <a href="https://github.com/${project.github}" target="_blank" rel="noopener">
-  //       <img
-  //         src="https://img.shields.io/badge/GitHub-5c5c5c?logo=github"
-  //         alt="GitHub: ${project.github}"
-  //       >
-  //     </a>
-  //   `
-  // }
-  // if (project.license) {
-  //   html_top +=`
-  //   <a href="https://opensource.org/licenses/${project.license}" target="_blank" rel="noopener">
-  //     <img
-  //       src="https://img.shields.io/badge/License-${project.license.replaceAll("-", "_")}--Clause-blue.svg"
-  //       alt="License: ${project.license}"
-  //     >
-  //   </a>
-  //   `
-  // }
-  // if (project.doi) {
-  //   html_top += `
-  //     <a href="https://doi.org/10.5281/zenodo.${project.doi}" target="_blank" rel="noopener">
-  //       <img
-  //         src="https://img.shields.io/badge/DOI-10.5281%2Fzenodo.${project.doi}-blue.svg"
-  //         alt="DOI: 10.5281/zenodo.${project.doi}"
-  //       >
-  //     </a>
-  //   `
-  // }
-  // if (project.github || project.license || project.doi) {
-  //   html_top += `</div>`
-  // }
   html_top += `<br><hr class=toc-hr>`
   return html_top;
 }
@@ -199,6 +147,23 @@ export async function getHtmlBottom(
   project: IMystProject
 ): Promise<string> {
   let html_bottom = `<br><hr class=toc-hr><br>`
+
+   if (project.authors) {
+    const authors = project.authors;
+    if (authors.length == 1) {
+      html_bottom += `<p id="toc-author">Author: `
+    } else {
+      html_bottom += `<p id="toc-author">Authors: `
+    }
+    authors.forEach((author, i) => {
+      if (i < authors.length - 1) {
+        html_bottom += `${author.name}, `
+      } else {
+        html_bottom += `${author.name}`
+      }
+    });
+    html_bottom += `</p>`
+  }
 
   if (project.github || project.license || project.doi) {
     html_bottom += `<div class=badges>`
