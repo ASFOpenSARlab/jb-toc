@@ -18,13 +18,6 @@ interface MystAuthors {
   name?: string;
 }
 
-interface MystDownload {
-  file?: string;
-  title?: string;
-  url?: string;
-  filename?: string;
-}
-
 export interface MystTOC {
   file?: string;
   title?: string;
