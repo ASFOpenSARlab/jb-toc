@@ -93,6 +93,6 @@
   border-top: 2px solid var(--jp-layout-color3);
 }
 
-div.lm-Widget[id='@jupyterlab-sidepanel/jupyterbook-toc'] {
+div.lm-Widget[id='@jupyterlab-sidepanel/jb-toc'] {
   overflow-y: auto;
 }

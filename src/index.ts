@@ -25,7 +25,7 @@ export function getJupyterAppInstance(app?: JupyterFrontEnd): JupyterFrontEnd {
 }
 
 const plugin: JupyterFrontEndPlugin<void> = {
-  id: 'jupyterlab-jupyterbook-navigation:plugin',
+  id: 'jb-toc:plugin',
   description:
     'A JupyterLab extension that mimics jupyter-book chapter navigation on an un-built, cloned jupyter book in JupyterLab.',
   autoStart: true,
@@ -38,11 +38,11 @@ const plugin: JupyterFrontEndPlugin<void> = {
   ) => {
     getJupyterAppInstance(app);
     console.log(
-      'JupyterLab extension jupyterlab-jupyterbook-navigation is activated!'
+      'JupyterLab extension jb-toc is activated!'
     );
 
     const widget = new Widget();
-    widget.id = '@jupyterlab-sidepanel/jupyterbook-toc';
+    widget.id = '@jupyterlab-sidepanel/jb-toc';
     widget.title.iconClass = 'jbook-icon jp-SideBar-tabIcon';
     widget.title.className = 'jbook-tab';
     widget.title.caption = 'Jupyter-Book Table of Contents';
@@ -66,7 +66,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
         addClickListenerToButtons(fileBrowser, docManager);
         addClickListenerToChevron();
       } catch (reason) {
-        console.error(`The jupyterlab_jupyterbook_navigation error: ${reason}`);
+        console.error(`jb_toc error: ${reason}`);
       }
     };
     shell.add(widget, 'left', { rank: 400 });

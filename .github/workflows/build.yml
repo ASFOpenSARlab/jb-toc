@@ -37,7 +37,7 @@ jobs:
         python -m pip install .[test]
 
         jupyter labextension list
-        jupyter labextension list 2>&1 | grep -ie "jupyterlab-jupyterbook-navigation.*OK"
+        jupyter labextension list 2>&1 | grep -ie "jb-toc.*OK"
         python -m jupyterlab.browser_check
 
     - name: Package the extension
@@ -46,13 +46,13 @@ jobs:
 
         pip install build
         python -m build
-        pip uninstall -y "jupyterlab_jupyterbook_navigation" jupyterlab
+        pip uninstall -y "jb_toc" jupyterlab
 
     - name: Upload extension packages
       uses: actions/upload-artifact@v4
       with:
         name: extension-artifacts
-        path: dist/jupyterlab_jupyterbook_navigation*
+        path: dist/jb_toc*
         if-no-files-found: error
 
   test_isolated:
@@ -75,10 +75,10 @@ jobs:
         sudo rm -rf $(which node)
         sudo rm -rf $(which node)
 
-        pip install "jupyterlab>=4.0.0,<5" jupyterlab_jupyterbook_navigation*.whl
+        pip install "jupyterlab>=4.0.0,<5" jb_toc*.whl
 
         jupyter labextension list
-        jupyter labextension list 2>&1 | grep -ie "jupyterlab-jupyterbook-navigation.*OK"
+        jupyter labextension list 2>&1 | grep -ie "jb-toc.*OK"
         python -m jupyterlab.browser_check --no-browser-test
 
   integration-tests:
@@ -104,7 +104,7 @@ jobs:
     - name: Install the extension
       run: |
         set -eux
-        python -m pip install "jupyterlab>=4.0.0,<5" jupyterlab_jupyterbook_navigation*.whl
+        python -m pip install "jupyterlab>=4.0.0,<5" jb_toc*.whl
 
     - name: Install dependencies
       working-directory: ui-tests
@@ -133,7 +133,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: jupyterlab_jupyterbook_navigation-playwright-tests
+        name: jb_toc-playwright-tests
         path: |
           ui-tests/test-results
           ui-tests/playwright-report

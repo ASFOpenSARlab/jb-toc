@@ -3,7 +3,7 @@ requires = ["hatchling>=1.5.0", "jupyterlab>=4.0.0,<5", "hatch-nodejs-version>=0
 build-backend = "hatchling.build"
 
 [project]
-name = "jupyterlab_jupyterbook_navigation"
+name = "jb_toc"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.8"
@@ -16,11 +16,10 @@ classifiers = [
     "License :: OSI Approved :: BSD License",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
     "jupyter-server-globbing",
@@ -34,24 +33,24 @@ source = "nodejs"
 fields = ["description", "authors", "urls"]
 
 [tool.hatch.build.targets.sdist]
-artifacts = ["jupyterlab_jupyterbook_navigation/labextension"]
+artifacts = ["jb_toc/labextension"]
 exclude = [".github", "binder"]
 
 [tool.hatch.build.targets.wheel.shared-data]
-"jupyterlab_jupyterbook_navigation/labextension" = "share/jupyter/labextensions/jupyterlab-jupyterbook-navigation"
-"install.json" = "share/jupyter/labextensions/jupyterlab-jupyterbook-navigation/install.json"
+"jb_toc/labextension" = "share/jupyter/labextensions/jb-toc"
+"install.json" = "share/jupyter/labextensions/jb-toc/install.json"
 
 [tool.hatch.build.hooks.version]
-path = "jupyterlab_jupyterbook_navigation/_version.py"
+path = "jb_toc/_version.py"
 
 [tool.hatch.build.hooks.jupyter-builder]
 dependencies = ["hatch-jupyter-builder>=0.5"]
 build-function = "hatch_jupyter_builder.npm_builder"
 ensured-targets = [
-    "jupyterlab_jupyterbook_navigation/labextension/static/style.js",
-    "jupyterlab_jupyterbook_navigation/labextension/package.json",
+    "jb_toc/labextension/static/style.js",
+    "jb_toc/labextension/package.json",
 ]
-skip-if-exists = ["jupyterlab_jupyterbook_navigation/labextension/static/style.js"]
+skip-if-exists = ["jb_toc/labextension/static/style.js"]
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
 build_cmd = "build:prod"
@@ -61,7 +60,7 @@ npm = ["jlpm"]
 build_cmd = "install:extension"
 npm = ["jlpm"]
 source_dir = "src"
-build_dir = "jupyterlab_jupyterbook_navigation/labextension"
+build_dir = "jb_toc/labextension"
 
 [tool.jupyter-releaser.options]
 version_cmd = "hatch version"

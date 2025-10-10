@@ -19,7 +19,7 @@ test('should emit an activation console message', async ({ page }) => {
     logs.filter(
       s =>
         s ===
-        'JupyterLab extension jupyterlab-jupyterbook-navigation is activated!'
+        'JupyterLab extension jb-toc is activated!'
     )
   ).toHaveLength(1);
 });

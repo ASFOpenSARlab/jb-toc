@@ -1,24 +1,24 @@
 # jupyterlab_jupyterbook_navigation
 
-[![Github Actions Status](https://github.com/ASFOpenSARlab/jupyterlab-jupyterbook-navigation/workflows/Build/badge.svg)](https://github.com/Alex-Lewandowski/jupyterlab-jbook-chapter-navigation/actions/workflows/build.yml)[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ASFOpenSARlab/jupyterlab-jupyterbook-navigation/main?urlpath=lab)
+[![Github Actions Status](https://github.com/ASFOpenSARlab/jb-toc/workflows/Build/badge.svg)](https://github.com/ASFOpenSARlab/jb-toc/actions/workflows/build.yml)[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ASFOpenSARlab/jb-toc/main?urlpath=lab)
 [![lite-badge](https://jupyterlite.rtfd.io/en/latest/_static/badge.svg)](https://alex-lewandowski.github.io/JupyterLite-demo/lab/index.html)
 
 A JupyterLab server extension that provides Jupyter-Book navigation in a sidepanel widget with a Jupyter-Book table of contents.
 
-https://github.com/ASFOpenSARlab/jupyterlab-jupyterbook-navigation/assets/37909088/3aa48f43-dfeb-466d-8f33-afc10f333f50
+https://github.com/ASFOpenSARlab/jb-toc/assets/37909088/3aa48f43-dfeb-466d-8f33-afc10f333f50
 
-NPM frontend extension: `jupyterlab-jupyterbook-navigation`
+NPM frontend extension: `jb-toc`
 
 ## Requirements
 
-- JupyterLab >= 4.0.0
+- JupyterLab >= 4.0.0 < 5
 
 ## Install
 
 To install the extension, execute:
 
 ```bash
-python -m pip install jupyterlab_jupyterbook_navigation
+python -m pip install jb_toc
 ```
 
 ## Uninstall
@@ -26,7 +26,7 @@ python -m pip install jupyterlab_jupyterbook_navigation
 To remove the extension, execute:
 
 ```bash
-python -m pip uninstall jupyterlab_jupyterbook_navigation
+python -m pip uninstall jb_toc
 ```
 
 ## Contributing
@@ -41,7 +41,7 @@ The `jlpm` command is JupyterLab's pinned version of
 
 ```bash
 # Clone the repo to your local environment
-# Change directory to the jupyterlab_jupyterbook_navigation directory
+# Change directory to the jb_toc directory
 # Install package in development mode
 pip install -e "."
 # Link your development version of the extension with JupyterLab
@@ -70,12 +70,12 @@ jupyter lab build --minimize=False
 ### Development uninstall
 
 ```bash
-pip uninstall jupyterlab_jupyterbook_navigation
+pip uninstall jb_toc
 ```
 
 In development mode, you will also need to remove the symlink created by `jupyter labextension develop`
 command. To find its location, you can run `jupyter labextension list` to figure out where the `labextensions`
-folder is located. Then you can remove the symlink named `jupyterlab-jupyterbook-navigation` within that folder.
+folder is located. Then you can remove the symlink named `jb-toc` within that folder.
 
 ### Testing the extension
 

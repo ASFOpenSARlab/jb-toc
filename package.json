@@ -1,5 +1,5 @@
 {
-    "name": "jupyterlab-jupyterbook-navigation",
+    "name": "jb-toc",
     "version": "1.0.4",
     "description": "A JupyterLab extension that mimics jupyter-book chapter navigation on an un-built, cloned jupyter book in JupyterLab.",
     "keywords": [
@@ -7,9 +7,9 @@
         "jupyterlab",
         "jupyterlab-extension"
     ],
-    "homepage": "https://github.com/ASFOpenSARlab/jupyterlab-jupyterbook-navigation",
+    "homepage": "https://github.com/ASFOpenSARlab/jb-toc",
     "bugs": {
-        "url": "https://github.com/ASFOpenSARlab/jupyterlab-jupyterbook-navigation/issues"
+        "url": "https://github.com/ASFOpenSARlab/jb-toc/issues"
     },
     "license": "BSD-3-Clause",
     "author": {
@@ -26,7 +26,7 @@
     "style": "style/index.css",
     "repository": {
         "type": "git",
-        "url": "https://github.com/ASFOpenSARlab/jupyterlab-jupyterbook-navigation.git"
+        "url": "https://github.com/ASFOpenSARlab/jb-toc.git"
     },
     "scripts": {
         "build": "jlpm build:lib && jlpm build:labextension:dev",
@@ -38,7 +38,7 @@
         "clean": "jlpm clean:lib",
         "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
         "clean:lintcache": "rimraf .eslintcache .stylelintcache",
-        "clean:labextension": "rimraf jupyterlab_jupyterbook_navigation/labextension jupyterlab_jupyterbook_navigation/_version.py",
+        "clean:labextension": "rimraf jb_toc/labextension jb_toc/_version.py",
         "clean:all": "jlpm clean:lib && jlpm clean:labextension && jlpm clean:lintcache",
         "eslint": "jlpm eslint:check --fix",
         "eslint:check": "eslint . --cache --ext .ts,.tsx",
@@ -97,7 +97,7 @@
     },
     "jupyterlab": {
         "extension": true,
-        "outputDir": "jupyterlab_jupyterbook_navigation/labextension"
+        "outputDir": "jb_toc/labextension"
     },
     "eslintIgnore": [
         "node_modules",
