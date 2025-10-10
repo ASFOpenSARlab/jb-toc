@@ -37,9 +37,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
     docManager: IDocumentManager
   ) => {
     getJupyterAppInstance(app);
-    console.log(
-      'JupyterLab extension jb-toc is activated!'
-    );
+    console.log('JupyterLab extension jb-toc is activated!');
 
     const widget = new Widget();
     widget.id = '@jupyterlab-sidepanel/jb-toc';
