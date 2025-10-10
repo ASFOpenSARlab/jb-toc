@@ -132,7 +132,7 @@
                         "PascalCase"
                     ],
                     "custom": {
-                        "regex": "^I[A-Z]",
+                        "regex": "^[A-Z]",
                         "match": true
                     }
                 }

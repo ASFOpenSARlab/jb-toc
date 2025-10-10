@@ -224,10 +224,6 @@ export async function getTOC(cwd: string): Promise<string> {
           const toc_html = await jb2.mystTOCToHtml(project.toc, configParent);
           const html_bottom = await jb2.getHtmlBottom(project);
 
-          if (project.downloads) {
-            {
-            }
-          }
           html = `
             ${html_top}
             <ul>${toc_html}</ul>
@@ -243,7 +239,7 @@ export async function getTOC(cwd: string): Promise<string> {
     }
   }
 
-  if (typeof html == 'string') {
+  if (typeof html === 'string') {
     const formatted_html = await prettier.format(html, {
       parser: 'html',
       plugins: [parserHtml]

@@ -6,7 +6,6 @@ export interface Myst {
 export interface MystProject {
   title?: string;
   subtitle?: string;
-  downloads?: MystDownload[];
   authors?: MystAuthors[];
   doi?: string;
   github?: string;
@@ -126,19 +125,19 @@ export async function getHtmlTop(
   if (project.subtitle) {
     html_top += `<p id="toc-subtitle">${project.subtitle}</p>`;
   }
-  html_top += `<br><hr class=toc-hr>`;
+  html_top += '<br><hr class="toc-hr">';
   return html_top;
 }
 
 export async function getHtmlBottom(project: MystProject): Promise<string> {
-  let html_bottom = `<br><hr class=toc-hr><br>`;
+  let html_bottom = '<br><hr class="toc-hr"><br>';
 
   if (project.authors) {
     const authors = project.authors;
-    if (authors.length == 1) {
-      html_bottom += `<p id="toc-author">Author: `;
+    if (authors.length === 1) {
+      html_bottom += '<p id="toc-author">Author: ';
     } else {
-      html_bottom += `<p id="toc-author">Authors: `;
+      html_bottom += '<p id="toc-author">Authors: ';
     }
     authors.forEach((author, i) => {
       if (i < authors.length - 1) {
@@ -147,11 +146,11 @@ export async function getHtmlBottom(project: MystProject): Promise<string> {
         html_bottom += `${author.name}`;
       }
     });
-    html_bottom += `</p>`;
+    html_bottom += '</p>';
   }
 
   if (project.github || project.license || project.doi) {
-    html_bottom += `<div class=badges>`;
+    html_bottom += '<div class="badges">';
   }
   if (project.github) {
     html_bottom += `
@@ -184,7 +183,7 @@ export async function getHtmlBottom(project: MystProject): Promise<string> {
     `;
   }
   if (project.github || project.license || project.doi) {
-    html_bottom += `</div>`;
+    html_bottom += '</div>';
   }
   if (project.copyright) {
     html_bottom += `
