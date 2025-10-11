@@ -175,13 +175,12 @@ let prettierModPromise:
 let htmlPluginPromise: Promise<any> | undefined;
 
 export async function formatHtmlForDev(html: string): Promise<string> {
-  if (process.env.NODE_ENV !== 'development') return html;
-
-  console.log(process.env.NODE_ENV);
+  if (process.env.NODE_ENV !== 'development') {
+    return html;
+  }
 
   prettierModPromise ??= import('prettier/standalone');
   htmlPluginPromise ??= import('prettier/plugins/html');
-
   const [prettierMod, htmlPlugin] = await Promise.all([
     prettierModPromise,
     htmlPluginPromise
