@@ -71,7 +71,7 @@ async function findConfigInParents(cwd: string): Promise<string | null> {
       const files = await ls(pth);
       for (const value of Object.values(files.content)) {
         const file = value as FileMetadata;
-        if (file.path.includes(configPattern)) {
+        if (file.path.endsWith(configPattern)) {
           return file.path;
         }
       }
@@ -90,7 +90,8 @@ export async function getFullPath(file_pattern: string, dir_pth: string) {
   const files = await ls(dir_pth);
   for (const value of Object.values(files.content)) {
     const file = value as FileMetadata;
-    if (file.path.includes(file_pattern)) {
+    if (file.path.endsWith(file_pattern)) {
+      console.log(file.path);
       return file.path;
     }
   }
@@ -178,7 +179,7 @@ export async function getTOC(cwd: string): Promise<string> {
   let configParent = null;
   let html;
   if (tocPath) {
-    const myst = tocPath.includes('myst');
+    const myst = tocPath.endsWith('myst.yml');
     const parts = tocPath.split('/');
 
     parts.pop();
@@ -189,7 +190,7 @@ export async function getTOC(cwd: string): Promise<string> {
       const configPattern = '_config.yml';
       for (const value of Object.values(files.content)) {
         const file = value as FileMetadata;
-        if (file.path.includes(configPattern)) {
+        if (file.path.endsWith(configPattern)) {
           configPath = file.path;
           break;
         }
