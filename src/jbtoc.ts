@@ -51,11 +51,11 @@ export async function ls(pth: string): Promise<any> {
 
 export function escapeHtml(str: string): string {
   return str
-    .replaceAll(/&/g, "&amp;")
-    .replaceAll(/</g, "&lt;")
-    .replaceAll(/>/g, "&gt;")
-    .replaceAll(/"/g, "&quot;")
-    .replaceAll(/'/g, "&#39;");
+    .replaceAll(/&/g, '&amp;')
+    .replaceAll(/</g, '&lt;')
+    .replaceAll(/>/g, '&gt;')
+    .replaceAll(/"/g, '&quot;')
+    .replaceAll(/'/g, '&#39;');
 }
 
 async function findConfigInParents(cwd: string): Promise<string | null> {
@@ -169,7 +169,9 @@ export async function globFiles(pattern: string): Promise<string[]> {
   return result;
 }
 
-let prettierModPromise: Promise<typeof import('prettier/standalone')> | undefined;
+let prettierModPromise:
+  | Promise<typeof import('prettier/standalone')>
+  | undefined;
 let htmlPluginPromise: Promise<any> | undefined;
 
 export async function formatHtmlForDev(html: string): Promise<string> {
@@ -182,7 +184,7 @@ export async function formatHtmlForDev(html: string): Promise<string> {
 
   const [prettierMod, htmlPlugin] = await Promise.all([
     prettierModPromise,
-    htmlPluginPromise,
+    htmlPluginPromise
   ]);
 
   const prettier: any = (prettierMod as any).default ?? prettierMod;
@@ -190,7 +192,7 @@ export async function formatHtmlForDev(html: string): Promise<string> {
 
   return await prettier.format(html, {
     parser: 'html',
-    plugins: [parserHtml],
+    plugins: [parserHtml]
   });
 }
 
@@ -277,7 +279,7 @@ export async function getTOC(cwd: string): Promise<string> {
       <p id="toc-author">Please navigate to a Jupyter-Book directory to view its Table of Contents</p>
       `;
   }
-  
+
   if (typeof html === 'string') {
     html = await formatHtmlForDev(html); // no-op in prod
     console.debug(html);

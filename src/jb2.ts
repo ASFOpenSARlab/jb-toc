@@ -131,7 +131,7 @@ export async function getHtmlTop(
   if (project.subtitle) {
     html_top += `<p id="toc-subtitle">${jbtoc.escapeHtml(String(project.subtitle))}</p>`;
   }
-  html_top += '<br><hr class="toc-hr">';  
+  html_top += '<br><hr class="toc-hr">';
   return html_top;
 }
 
