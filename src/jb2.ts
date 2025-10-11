@@ -87,7 +87,6 @@ export async function mystTOCToHtml(
       url = jbtoc.escapeHtml(String(item.url));
     }
 
-    console.log(item);
     if ((item.title || item.file) && item.children) {
       // If there are a title, children, and a file, use the file path as the title
       if (item.file) {
@@ -132,10 +131,7 @@ export async function getHtmlTop(
   if (project.subtitle) {
     html_top += `<p id="toc-subtitle">${jbtoc.escapeHtml(String(project.subtitle))}</p>`;
   }
-  html_top += '<br><hr class="toc-hr">';
-  
-  console.log(html_top);
-  
+  html_top += '<br><hr class="toc-hr">';  
   return html_top;
 }
 
@@ -203,8 +199,5 @@ export async function getHtmlBottom(project: MystProject): Promise<string> {
       <p style="padding-left: 15px">Copyright © ${jbtoc.escapeHtml(String(project.copyright))}</p>
     `;
   }
-
-  console.log(html_bottom);
-
   return html_bottom;
 }

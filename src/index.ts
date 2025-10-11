@@ -79,7 +79,6 @@ function addClickListenerToChevron() {
   buttons.forEach(buttonElement => {
     const button = buttonElement as HTMLButtonElement;
     button.addEventListener('click', (event: Event) => {
-      console.log('Button clicked');
       toggleList(button);
     });
   });
@@ -104,8 +103,6 @@ function addClickListenerToButtons(
   const buttons = document.querySelectorAll('.toc-button');
   buttons.forEach(button => {
     button.addEventListener('click', (event: Event) => {
-      console.log('Button clicked');
-
       if (!fileBrowser) {
         console.error('File browser not found');
         return;
@@ -129,7 +126,7 @@ function addClickListenerToButtons(
         );
         return;
       }
-      console.log(`Current directory: ${fileBrowser.model.path}`);
+      console.debug(`Current directory: ${fileBrowser.model.path}`);
 
       const filePath = button.getAttribute('data-file-path');
       if (typeof filePath === 'string') {

@@ -1,8 +1,6 @@
 import * as path from 'path';
 import * as yaml from 'js-yaml';
 import { getJupyterAppInstance } from './index';
-import prettier from 'prettier';
-import parserHtml from 'prettier/plugins/html';
 
 import * as jb1 from './jb1';
 import * as jb2 from './jb2';
@@ -52,7 +50,6 @@ export async function ls(pth: string): Promise<any> {
 }
 
 export function escapeHtml(str: string): string {
-  console.log(str);
   return str
     .replaceAll(/&/g, "&amp;")
     .replaceAll(/</g, "&lt;")
@@ -91,7 +88,6 @@ export async function getFullPath(file_pattern: string, dir_pth: string) {
   for (const value of Object.values(files.content)) {
     const file = value as FileMetadata;
     if (file.path.endsWith(file_pattern)) {
-      console.log(file.path);
       return file.path;
     }
   }
@@ -173,11 +169,36 @@ export async function globFiles(pattern: string): Promise<string[]> {
   return result;
 }
 
+let prettierModPromise: Promise<typeof import('prettier/standalone')> | undefined;
+let htmlPluginPromise: Promise<any> | undefined;
+
+export async function formatHtmlForDev(html: string): Promise<string> {
+  if (process.env.NODE_ENV !== 'development') return html;
+
+  console.log(process.env.NODE_ENV);
+
+  prettierModPromise ??= import('prettier/standalone');
+  htmlPluginPromise ??= import('prettier/plugins/html');
+
+  const [prettierMod, htmlPlugin] = await Promise.all([
+    prettierModPromise,
+    htmlPluginPromise,
+  ]);
+
+  const prettier: any = (prettierMod as any).default ?? prettierMod;
+  const parserHtml = (htmlPlugin as any).default ?? htmlPlugin;
+
+  return await prettier.format(html, {
+    parser: 'html',
+    plugins: [parserHtml],
+  });
+}
+
 export async function getTOC(cwd: string): Promise<string> {
   const tocPath = await findConfigInParents(cwd);
   let configPath = null;
   let configParent = null;
-  let html;
+  let html: string | undefined | Error | any;
   if (tocPath) {
     const myst = tocPath.endsWith('myst.yml');
     const parts = tocPath.split('/');
@@ -248,9 +269,7 @@ export async function getTOC(cwd: string): Promise<string> {
         console.error('Error reading or parsing _toc.yml:', error);
       }
     }
-  }
-
-  if (typeof html !== 'string') {
+  } else {
     html = `
       <p id="toc-title">Not a Jupyter-Book</p>
       <p id="toc-author">Could not find a "_toc.yml", "_config.yml", or "myst.yml in or above the current directory:</p>
@@ -258,11 +277,32 @@ export async function getTOC(cwd: string): Promise<string> {
       <p id="toc-author">Please navigate to a Jupyter-Book directory to view its Table of Contents</p>
       `;
   }
+  
+  if (typeof html === 'string') {
+    html = await formatHtmlForDev(html); // no-op in prod
+    console.debug(html);
+    return html;
+  } else {
+    let errMsg = '';
+    try {
+      errMsg = JSON.stringify(html, null, 2);
+    } catch {
+      errMsg = String(html);
+    }
+    const stack =
+      (html instanceof Error && html.stack) ||
+      (typeof html === 'object' && 'stack' in (html ?? {}))
+        ? (html as any).stack
+        : '';
 
-  html = await prettier.format(html, {
-    parser: 'html',
-    plugins: [parserHtml]
-  });
-  console.debug(html);
-  return html;
+    const escaped = escapeHtml(errMsg + (stack ? `\n\n${stack}` : ''));
+
+    return `
+      <div class="jbook-toc-error" style="color: red; font-family: monospace; white-space: pre-wrap; padding: 1em;">
+        <b>⚠️ TOC generation error:</b>
+        <hr>
+        ${escaped}
+      </div>
+    `;
+  }
 }
