@@ -51,6 +51,16 @@ export async function ls(pth: string): Promise<any> {
   }
 }
 
+export function escapeHtml(str: string): string {
+  console.log(str);
+  return str
+    .replaceAll(/&/g, "&amp;")
+    .replaceAll(/</g, "&lt;")
+    .replaceAll(/>/g, "&gt;")
+    .replaceAll(/"/g, "&quot;")
+    .replaceAll(/'/g, "&#39;");
+}
+
 async function findConfigInParents(cwd: string): Promise<string | null> {
   const configPatterns: string[] = ['myst.yml', '_toc.yml'];
   for (const configPattern of configPatterns) {
@@ -201,8 +211,8 @@ export async function getTOC(cwd: string): Promise<string> {
           const toc_html = await jb1.jBook1TOCToHtml(toc, configParent);
           html = `
           <div class="jbook-toc" data-toc-dir="${configParent}">
-            <p id="toc-title">${config.title}</p>
-            <p id="toc-author">Author: ${config.author}</p>
+            <p id="toc-title">${escapeHtml(String(config.title))}</p>
+            <p id="toc-author">Author: ${escapeHtml(String(config.author))}</p>
             ${toc_html}
           </div>
           `;
@@ -239,19 +249,19 @@ export async function getTOC(cwd: string): Promise<string> {
     }
   }
 
-  if (typeof html === 'string') {
-    const formatted_html = await prettier.format(html, {
-      parser: 'html',
-      plugins: [parserHtml]
-    });
-    console.log(formatted_html);
-    return formatted_html;
-  } else {
-    return `
+  if (typeof html !== 'string') {
+    html = `
       <p id="toc-title">Not a Jupyter-Book</p>
       <p id="toc-author">Could not find a "_toc.yml", "_config.yml", or "myst.yml in or above the current directory:</p>
       <p id="toc-author">${cwd}</p>
       <p id="toc-author">Please navigate to a Jupyter-Book directory to view its Table of Contents</p>
       `;
   }
+
+  html = await prettier.format(html, {
+    parser: 'html',
+    plugins: [parserHtml]
+  });
+  console.debug(html);
+  return html;
 }

@@ -71,7 +71,7 @@ async function getSubSection(
     if (!title) {
       title = file;
     }
-    html += `<button class="jp-Button toc-button tb-level${level}" style="display: block;" data-file-path="${pth}">${title}</button>`;
+    html += `<button class="jp-Button toc-button tb-level${level}" style="display: block;" data-file-path="${jbtoc.escapeHtml(String(pth))}">${jbtoc.escapeHtml(String(title))}</button>`;
   }
   for (const k of parts) {
     if (k.sections && k.file) {
@@ -83,9 +83,10 @@ async function getSubSection(
       if (!title) {
         title = k.file;
       }
+      title = jbtoc.escapeHtml(String(title));
       html += `
         <div>
-            <button class="jp-Button toc-button tb-level${level}"style="display: inline-block;" data-file-path="${pth}">${title}</button>
+            <button class="jp-Button toc-button tb-level${level}"style="display: inline-block;" data-file-path="${jbtoc.escapeHtml(String(pth))}">${jbtoc.escapeHtml(String(title))}</button>
             <button class="jp-Button toc-chevron" style="display: inline-block;"><i class="fa fa-chevron-down "></i></button>
         </div>
         <div style="display: none;">
@@ -102,7 +103,8 @@ async function getSubSection(
     } else if (k.file) {
       await insertFile(k.file);
     } else if (k.url) {
-      html += `<button class="jp-Button toc-button tb-level${level}" style="display:block;"><a class="toc-link tb-level${level}" href="${k.url}" target="_blank" rel="noopener noreferrer" style="display: block;">${k.title}</a></button>`;
+      const url = String(jbtoc.escapeHtml(k.url));
+      html += `<button class="jp-Button toc-button tb-level${level}" style="display:block;"><a class="toc-link tb-level${level}" href="${jbtoc.escapeHtml(String(url))}" target="_blank" rel="noopener noreferrer" style="display: block;">${jbtoc.escapeHtml(String(k.title))}</a></button>`;
     } else if (k.glob) {
       const files = await jbtoc.globFiles(`${cwd}${k.glob}`);
       for (const file of files) {
@@ -121,7 +123,7 @@ export async function jBook1TOCToHtml(
   let html = '\n<ul>';
   if (toc.parts) {
     for (const chapter of toc.parts) {
-      html += `\n<p class="caption" role="heading"><span class="caption-text"><b>\n${chapter.caption}\n</b></span>\n</p>`;
+      html += `\n<p class="caption" role="heading"><span class="caption-text"><b>\n${jbtoc.escapeHtml(String(chapter.caption))}\n</b></span>\n</p>`;
       const subSectionHtml = await getSubSection(chapter.chapters, cwd);
       html += `\n${subSectionHtml}`;
     }
