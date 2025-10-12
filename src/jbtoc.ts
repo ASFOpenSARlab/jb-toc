@@ -49,11 +49,15 @@ export async function ls(pth: string): Promise<any> {
   }
 }
 
-export function escapeHtml(str: string): string {
+export function escHtml(str: string): string {
   return str
     .replaceAll(/&/g, '&amp;')
     .replaceAll(/</g, '&lt;')
-    .replaceAll(/>/g, '&gt;')
+    .replaceAll(/>/g, '&gt;');
+}
+
+export function escAttr(str: string): string {
+  return escHtml(str)
     .replaceAll(/"/g, '&quot;')
     .replaceAll(/'/g, '&#39;');
 }
@@ -234,8 +238,8 @@ export async function getTOC(cwd: string): Promise<string> {
           const toc_html = await jb1.jBook1TOCToHtml(toc, configParent);
           html = `
           <div class="jbook-toc" data-toc-dir="${configParent}">
-            <p id="toc-title">${escapeHtml(String(config.title))}</p>
-            <p id="toc-author">Author: ${escapeHtml(String(config.author))}</p>
+            <p id="toc-title">${escHtml(String(config.title))}</p>
+            <p id="toc-author">Author: ${escHtml(String(config.author))}</p>
             ${toc_html}
           </div>
           `;
@@ -296,7 +300,7 @@ export async function getTOC(cwd: string): Promise<string> {
         ? (html as any).stack
         : '';
 
-    const escaped = escapeHtml(errMsg + (stack ? `\n\n${stack}` : ''));
+    const escaped = escHtml(errMsg + (stack ? `\n\n${stack}` : ''));
 
     return `
       <div class="jbook-toc-error" style="color: red; font-family: monospace; white-space: pre-wrap; padding: 1em;">
