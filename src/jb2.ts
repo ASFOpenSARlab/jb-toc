@@ -79,7 +79,7 @@ export async function mystTOCToHtml(
     return file_html;
   }
 
-  async function insertMystTitle(htmlTitle: string, attrTitle: string,) {
+  async function insertMystTitle(htmlTitle: string, attrTitle: string) {
     const sectionId = `sec-${Math.random().toString(36).slice(2)}`;
 
     return `
