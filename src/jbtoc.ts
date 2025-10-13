@@ -49,7 +49,7 @@ export async function ls(pth: string): Promise<any> {
 }
 
 export function escHtml(str: string): string {
-  if (str == null) {
+  if (str === null) {
     return '';
   }
   const s = String(str);
@@ -60,7 +60,7 @@ export function escHtml(str: string): string {
 }
 
 export function escAttr(str: string): string {
-  if (str == null) {
+  if (str === null) {
     return '';
   }
   const s = String(str);
