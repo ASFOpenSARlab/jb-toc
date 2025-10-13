@@ -37,13 +37,16 @@ export async function mystTOCToHtml(
     const k_dir = parts.join('/');
     let pth = await jbtoc.getFullPath(file, `${cwd}${k_dir}`);
     pth = jbtoc.escAttr(String(pth));
-    let title = await jbtoc.getFileTitleFromHeader(pth);
-    title = jbtoc.escHtml(String(title));
-    const sectionId = `sec-${Math.random().toString(36).slice(2)}`;
 
+    let title = await jbtoc.getFileTitleFromHeader(pth);
     if (!title) {
       title = file;
     }
+    const htmlTitle = jbtoc.escHtml(String(title));
+    const attrTitle = jbtoc.escAttr(String(title));
+
+    const sectionId = `sec-${Math.random().toString(36).slice(2)}`;
+
     let file_html;
     if (chevron) {
       file_html = `<div class="toc-row">
@@ -51,15 +54,15 @@ export async function mystTOCToHtml(
           type="button"
           class="jp-Button toc-button tb-level${level} toc-file"
           data-file-path="${pth}"
-          aria-label="Open ${title}"
-        ><b>${title}</b></button>
+          aria-label="Open ${attrTitle}"
+        ><b>${htmlTitle}</b></button>
 
         <button
           type="button"
           class="jp-Button toc-chevron"
           aria-expanded="false"
           aria-controls="${sectionId}"
-          aria-label="Toggle section for ${title}"
+          aria-label="Toggle section for ${attrTitle}"
         ><i class="fa fa-chevron-down"></i></button>
       </div>
       <div id="${sectionId}" class="toc-children" hidden>
@@ -68,9 +71,9 @@ export async function mystTOCToHtml(
       file_html = `<button
         class="jp-Button toc-button tb-level${level}"
         data-file-path="${pth}"
-        aria-label="Open ${title}"
+        aria-label="Open ${attrTitle}"
       >
-        ${title}
+        ${htmlTitle}
       </button>`;
     }
     return file_html;
