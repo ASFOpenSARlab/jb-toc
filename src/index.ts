@@ -93,7 +93,7 @@ function toggleList(button: HTMLButtonElement): void {
   const isHidden = list.hidden;
   list.hidden = !isHidden;
 
-  button.setAttribute('aria-expanded', String(isHidden));
+  button.setAttribute('aria-expanded', String(!isHidden));
   button.innerHTML = isHidden
     ? '<i class="fa fa-chevron-up toc-chevron"></i>'
     : '<i class="fa fa-chevron-down toc-chevron"></i>';

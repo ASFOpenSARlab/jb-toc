@@ -68,7 +68,7 @@ async function getSubSection(
     const k_dir = parts.join('/');
     const pth = await jbtoc.getFullPath(file, `${cwd}${k_dir}`);
     let title;
-    if (typeof(pth) === 'string') {
+    if (typeof pth === 'string') {
       title = await jbtoc.getFileTitleFromHeader(pth);
     }
     if (!title) {
@@ -83,7 +83,7 @@ async function getSubSection(
       const k_dir = parts.join('/');
       const pth = await jbtoc.getFullPath(k.file, `${cwd}${k_dir}`);
       let title;
-      if (typeof(pth) === 'string') {
+      if (typeof pth === 'string') {
         title = await jbtoc.getFileTitleFromHeader(pth);
       }
       if (!title) {
