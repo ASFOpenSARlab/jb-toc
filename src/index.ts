@@ -85,15 +85,16 @@ function addClickListenerToChevron() {
 }
 
 function toggleList(button: HTMLButtonElement): void {
-  const list = button.parentElement?.nextElementSibling as HTMLElement;
+  const list = button.parentElement?.nextElementSibling as HTMLElement | null;
+  if (!list) return;
 
-  if (list.style.display === 'none') {
-    list.style.display = 'block';
-    button.innerHTML = '<i class="fa fa-chevron-up toc-chevron"></i>';
-  } else {
-    list.style.display = 'none';
-    button.innerHTML = '<i class="fa fa-chevron-down toc-chevron"></i>';
-  }
+  const isHidden = list.hidden;
+  list.hidden = !isHidden;
+
+  button.setAttribute('aria-expanded', String(isHidden));
+  button.innerHTML = isHidden
+    ? '<i class="fa fa-chevron-up toc-chevron"></i>'
+    : '<i class="fa fa-chevron-down toc-chevron"></i>';
 }
 
 function addClickListenerToButtons(

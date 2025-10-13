@@ -3,6 +3,7 @@
 .jp-Button.toc-button {
   color: var(--jp-layout-color4);
   background-color: var(--jp-layout-color1);
+  display: block;
 }
 
 .jp-Button.toc-button:hover {
@@ -15,8 +16,9 @@
   padding-left: 6px;
 }
 
-.toc-link {
-  color: var(--jp-content-link-color);
+.jp-Button.toc-button.toc-link {
+  /* color: var(--jp-content-link-color); */
+  color: #1a73e8
 }
 
 .jp-Button.toc-chevron:hover {
@@ -96,3 +98,17 @@
 div.lm-Widget[id='@jupyterlab-sidepanel/jb-toc'] {
   overflow-y: auto;
 }
+
+.toc-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.toc-children[hidden] { display: none; }
+
+.toc-children { display: block; }
+
+.caption { margin: 0; } 
