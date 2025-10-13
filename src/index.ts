@@ -86,7 +86,9 @@ function addClickListenerToChevron() {
 
 function toggleList(button: HTMLButtonElement): void {
   const list = button.parentElement?.nextElementSibling as HTMLElement | null;
-  if (!list) return;
+  if (!list) {
+    return;
+  }
 
   const isHidden = list.hidden;
   list.hidden = !isHidden;
