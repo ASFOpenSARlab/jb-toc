@@ -81,6 +81,7 @@ export async function mystTOCToHtml(
 
   async function insertMystTitle(title: string) {
     const sectionId = `sec-${Math.random().toString(36).slice(2)}`;
+    const attrTitle = jbtoc.escAttr(title);
 
     return `
       <div class="toc-row">
@@ -92,7 +93,7 @@ export async function mystTOCToHtml(
           class="jp-Button toc-chevron"
           aria-expanded="false"
           aria-controls="${sectionId}"
-          aria-label="Toggle section for ${title}"
+          aria-label="Toggle section for ${attrTitle}"
         ><i class="fa fa-chevron-down"></i>
         </button>
       </div>
