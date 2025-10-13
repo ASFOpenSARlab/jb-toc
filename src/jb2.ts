@@ -79,14 +79,13 @@ export async function mystTOCToHtml(
     return file_html;
   }
 
-  async function insertMystTitle(title: string) {
+  async function insertMystTitle(htmlTitle: string, attrTitle: string,) {
     const sectionId = `sec-${Math.random().toString(36).slice(2)}`;
-    const attrTitle = jbtoc.escAttr(title);
 
     return `
       <div class="toc-row">
         <p class="caption tb-level${level}" role="heading" aria-level="${level}">
-          <b>${title}</b>
+          <b>${htmlTitle}</b>
         </p>
         <button
           type="button"
@@ -101,7 +100,7 @@ export async function mystTOCToHtml(
     `;
   }
 
-  async function insertUrl(title: string, url: string) {
+  async function insertUrl(htmlTitle: string, attrTitle: string, url: string) {
     return `
     <div class="toc-row">
       <a
@@ -109,9 +108,9 @@ export async function mystTOCToHtml(
         href="${url}"
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Open external link to ${title}"
+        aria-label="Open external link to ${attrTitle}"
       >
-        ${title}
+        ${htmlTitle}
       </a>
     </div>
     `;
@@ -124,21 +123,22 @@ export async function mystTOCToHtml(
   const html_snippets: string[] = [];
   for (const item of toc) {
     const file = item.file ? jbtoc.escAttr(encodeURI(String(item.file))) : '';
-    const title = item.title ? jbtoc.escHtml(String(item.title)) : '';
+    const htmlTitle = item.title ? jbtoc.escHtml(String(item.title)) : '';
+    const attrTitle = item.title ? jbtoc.escAttr(String(item.title)) : '';
     const url = item.url ? jbtoc.escAttr(encodeURI(String(item.url))) : '';
 
     if ((item.title || item.file) && item.children) {
       if (item.file) {
         html_snippets.push(await insertFile(file, true));
       } else if (item.title) {
-        html_snippets.push(await insertMystTitle(title));
+        html_snippets.push(await insertMystTitle(htmlTitle, attrTitle));
       }
       html_snippets.push(await mystTOCToHtml(item.children, cwd, level + 1));
       html_snippets.push('</div>');
     } else if (item.file) {
       html_snippets.push(await insertFile(file));
     } else if (item.url && item.title) {
-      html_snippets.push(await insertUrl(title, url));
+      html_snippets.push(await insertUrl(htmlTitle, attrTitle, url));
     } else if (item.glob) {
       const files = await jbtoc.globFiles(`${cwd}${item.glob}`);
       for (const file of files) {
