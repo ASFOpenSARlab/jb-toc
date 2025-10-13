@@ -26,150 +26,95 @@ export interface MystTOC {
   glob?: string;
 }
 
-// export async function mystTOCToHtml(
-//   toc: MystTOC[],
-//   cwd: string,
-//   level: number = 1,
-//   html: string = ''
-// ): Promise<string> {
-//   if (cwd && cwd.slice(-1) !== '/') {
-//     cwd = cwd + '/';
-//   }
-
-//   async function insertFile(file: string, chevron: boolean = false) {
-//     const parts = file.split('/');
-//     parts.pop();
-//     const k_dir = parts.join('/');
-//     const pth = await jbtoc.getFullPath(file, `${cwd}${k_dir}`);
-//     let title = await jbtoc.getFileTitleFromHeader(pth);
-//     if (!title) {
-//       title = file;
-//     }
-//     if (chevron) {
-//       html += `
-//         <div style="display: flex; align-items: center;">
-//             <button class="jp-Button toc-button tb-level${level}"
-//                     style="display: inline-block; font-weight: bold"
-//                     data-file-path="${pth}">
-//               ${title}
-//             </button>
-//             <button class="jp-Button toc-chevron" style="display: inline-block;"><i class="fa fa-chevron-down "></i></button>
-//         </div>
-//         <div style="display: none;">
-//         `;
-//     } else {
-//       html += `<button class="jp-Button toc-button tb-level${level}" style="display: block;" data-file-path="${pth}">${title}</button>`;
-//     }
-//   }
-
-//   async function insertMystTitle(title: string) {
-//     html += `
-//     <div style="display: flex; align-items: center;">
-//         <p class="caption tb-level${level}" role="heading" style="margin: 0;">
-//         <span class="caption-text"><b>${title}</b></span></p>
-//         <button class="jp-Button toc-chevron" style="display: inline-block;"><i class="fa fa-chevron-down "></i></button>
-//     </div>
-//     <div style="display: none;">
-//     `;
-//   }
-
-//   for (const item of toc) {
-//     let file = '';
-//     if (item.file) {
-//       file = jbtoc.escapeHtml(String(item.file));
-//     }
-//     let title = '';
-//     if (item.title) {
-//       title = jbtoc.escapeHtml(String(item.title));
-//     }
-//     let url = '';
-//     if (item.url) {
-//       url = jbtoc.escapeHtml(String(item.url));
-//     }
-
-//     if ((item.title || item.file) && item.children) {
-//       // If there are a title, children, and a file, use the file path as the title
-//       if (item.file) {
-//         await insertFile(file, true);
-//       } else if (item.title) {
-//         insertMystTitle(title);
-//       }
-//       const html_cur = html;
-//       html = await mystTOCToHtml(
-//         item.children,
-//         cwd,
-//         (level = level + 1),
-//         (html = html_cur)
-//       );
-//       level = level - 1;
-//       html += '</div>';
-//     } else if (item.file) {
-//       await insertFile(file);
-//     } else if (item.url && item.title) {
-//       html += `<button class="jp-Button toc-button tb-level${level}" style="display:block;"><a class="toc-link tb-level${level}" 
-//       href="${url}" target="_blank" rel="noopener noreferrer" style="display: block;">${title}</a></button>`;
-//     } else if (item.glob) {
-//       const files = await jbtoc.globFiles(`${cwd}${item.glob}`);
-//       for (const file of files) {
-//         const relative = file.replace(`${cwd}`, '');
-//         await insertFile(relative);
-//       }
-//     }
-//   }
-//   return html;
-// }
-
 export async function mystTOCToHtml(
   toc: MystTOC[],
   cwd: string,
-  level: number = 1,
+  level: number = 1
 ): Promise<string> {
-  if (cwd && cwd.slice(-1) !== '/') {
-    cwd = cwd + '/';
-  }
-
   async function insertFile(file: string, chevron: boolean = false) {
     const parts = file.split('/');
     parts.pop();
     const k_dir = parts.join('/');
-    const pth = await jbtoc.getFullPath(file, `${cwd}${k_dir}`);
+    let pth = await jbtoc.getFullPath(file, `${cwd}${k_dir}`);
+    pth = jbtoc.escAttr(String(pth));
     let title = await jbtoc.getFileTitleFromHeader(pth);
+    title = jbtoc.escHtml(String(title));
+    const sectionId = `sec-${Math.random().toString(36).slice(2)}`;
+
     if (!title) {
       title = file;
     }
     let file_html;
     if (chevron) {
-      file_html = `
-        <div style="display: flex; align-items: center;">
-            <button class="jp-Button toc-button tb-level${level}"
-                    style="display: inline-block; font-weight: bold"
-                    data-file-path="${pth}">
-              ${title}
-            </button>
-            <button class="jp-Button toc-chevron" style="display: inline-block;"><i class="fa fa-chevron-down "></i></button>
-        </div>
-        <div style="display: none;">
-        `;
+      file_html = `<div class="toc-row">
+        <button
+          type="button"
+          class="jp-Button toc-button tb-level${level} toc-file"
+          data-file-path="${pth}"
+          aria-label="Open ${title}"
+        ><b>${title}</b></button>
+
+        <button
+          type="button"
+          class="jp-Button toc-chevron"
+          aria-expanded="false"
+          aria-controls="${sectionId}"
+          aria-label="Toggle section for ${title}"
+        ><i class="fa fa-chevron-down"></i></button>
+      </div>
+      <div id="${sectionId}" class="toc-children" hidden>
+    `;
     } else {
-      file_html = `<button class="jp-Button toc-button tb-level${level}" style="display: block;" data-file-path="${pth}">${title}</button>`;
+      file_html = `<button
+        class="jp-Button toc-button tb-level${level}"
+        data-file-path="${pth}"
+        aria-label="Open ${title}"
+      >
+        ${title}
+      </button>`;
     }
-    return file_html
+    return file_html;
   }
 
   async function insertMystTitle(title: string) {
+    const sectionId = `sec-${Math.random().toString(36).slice(2)}`;
+
     return `
-    <div style="display: flex; align-items: center;">
-        <p class="caption tb-level${level}" role="heading" style="margin: 0;">
-        <span class="caption-text"><b>${title}</b></span></p>
-        <button class="jp-Button toc-chevron" style="display: inline-block;"><i class="fa fa-chevron-down "></i></button>
-    </div>
-    <div style="display: none;">
+      <div class="toc-row">
+        <p class="caption tb-level${level}" role="heading" aria-level="${level}">
+          <b>${title}</b>
+        </p>
+        <button
+          type="button"
+          class="jp-Button toc-chevron"
+          aria-expanded="false"
+          aria-controls="${sectionId}"
+          aria-label="Toggle section for ${title}"
+        ><i class="fa fa-chevron-down"></i>
+        </button>
+      </div>
+      <div id="${sectionId}" class="toc-children" hidden>
     `;
   }
 
   async function insertUrl(title: string, url: string) {
-    return `<button class="jp-Button toc-button tb-level${level}" style="display:block;"><a class="toc-link tb-level${level}" 
-      href="${url}" target="_blank" rel="noopener noreferrer" style="display: block;">${title}</a></button>`;
+    return `
+    <div class="toc-row">
+      <a
+        class="jp-Button toc-button toc-link tb-level${level}"
+        href="${url}"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Open external link to ${title}"
+      >
+        ${title}
+      </a>
+    </div>
+    `;
+  }
+
+  if (cwd && cwd.slice(-1) !== '/') {
+    cwd = cwd + '/';
   }
 
   const html_snippets: string[] = [];
@@ -184,11 +129,7 @@ export async function mystTOCToHtml(
       } else if (item.title) {
         html_snippets.push(await insertMystTitle(title));
       }
-      html_snippets.push(await mystTOCToHtml(
-        item.children,
-        cwd,
-        level+1,
-      ));
+      html_snippets.push(await mystTOCToHtml(item.children, cwd, level + 1));
       html_snippets.push('</div>');
     } else if (item.file) {
       html_snippets.push(await insertFile(file));
@@ -202,7 +143,7 @@ export async function mystTOCToHtml(
       }
     }
   }
-  return html_snippets.join("");
+  return html_snippets.join('');
 }
 
 export async function getHtmlTop(
@@ -222,64 +163,99 @@ export async function getHtmlTop(
 }
 
 export async function getHtmlBottom(project: MystProject): Promise<string> {
+  function getDOIUrl(doi: string) {
+    if (!doi) {
+      return '';
+    }
+
+    doi = String(doi).trim();
+    const match = doi.match(/10\.\S+/);
+    if (match) {
+      doi = match[0];
+    }
+
+    const doiUrl = `https://doi.org/${doi}`;
+    const encoded = encodeURIComponent(doi);
+
+    return `
+  <a
+    href="${doiUrl}"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="toc-link badge-link"
+    aria-label="Open DOI ${doi} (opens in a new tab)"
+  >
+    <img
+      src="https://img.shields.io/static/v1?label=DOI&message=${encoded}&color=0A84FF"
+      alt="DOI: ${doi}"
+      loading="lazy"
+    >
+  </a>`;
+  }
+
   let html_bottom = '<br><hr class="toc-hr"><br>';
 
-  if (project.authors) {
-    const authors = project.authors;
-    if (authors.length === 1) {
-      html_bottom += '<p id="toc-author">Author: ';
-    } else {
-      html_bottom += '<p id="toc-author">Authors: ';
+  if (Array.isArray(project.authors) && project.authors.length) {
+    const names = project.authors
+      .filter(a => a && a.name)
+      .map(a => jbtoc.escHtml(String(a.name)));
+
+    if (names.length) {
+      const label = names.length === 1 ? 'Author:' : 'Authors:';
+      html_bottom += `<p id="toc-author">${label} ${names.join(', ')}</p>`;
     }
-    authors.forEach((author, i) => {
-      if (i < authors.length - 1 && author.name) {
-        html_bottom += `${jbtoc.escHtml(String(author.name))}, `;
-      } else if (author.name) {
-        html_bottom += `${jbtoc.escHtml(String(author.name))}`;
-      }
-    });
-    html_bottom += '</p>';
   }
 
   if (project.github || project.license || project.doi) {
     html_bottom += '<div class="badges">';
   }
+
   if (project.github) {
     const github = jbtoc.escAttr(encodeURI(String(project.github)));
     html_bottom += `
-      <a href="https://github.com/${github}" target="_blank" rel="noopener">
+      <a
+        href="https://github.com/${github}"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="toc-link github-link"
+        aria-label="Open GitHub repository ${github} (opens in a new tab)"
+      >
         <img
           src="https://img.shields.io/badge/GitHub-5c5c5c?logo=github"
-          alt="GitHub: ${github}"
+          alt="GitHub badge for ${github}"
+          loading="lazy"
         >
-      </a>
+      </a>   
     `;
   }
+
   if (project.license) {
-    const license = jbtoc.escHtml(String(project.license));
+    const license = String(project.license);
     html_bottom += `
-    <a href="https://opensource.org/licenses/${license}" target="_blank" rel="noopener">
-      <img
-        src="https://img.shields.io/badge/License-${license.replaceAll('-', '_')}--Clause-blue.svg"
-        alt="License: ${license}"
+      <a
+        href="https://opensource.org/licenses/${license}"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="toc-link badge-link"
+        aria-label="Open ${license} license text (opens in a new tab)"
       >
-    </a>
-    `;
-  }
-  if (project.doi) {
-    const doi = jbtoc.escHtml(String(project.doi));
-    html_bottom += `
-      <a href="https://doi.org/10.5281/zenodo.${doi}" target="_blank" rel="noopener">
         <img
-          src="https://img.shields.io/badge/DOI-10.5281%2Fzenodo.${doi}-blue.svg"
-          alt="DOI: 10.5281/zenodo.${doi}"
+          src="https://img.shields.io/static/v1?label=License&message=${encodeURIComponent(license)}&color=0A84FF"
+          alt="License: ${license}"
+          loading="lazy"
         >
       </a>
     `;
   }
+
+  if (project.doi) {
+    html_bottom += getDOIUrl(project.doi);
+  }
+
   if (project.github || project.license || project.doi) {
     html_bottom += '</div>';
   }
+
   if (project.copyright) {
     html_bottom += `
       <p style="padding-left: 15px">Copyright © ${jbtoc.escHtml(String(project.copyright))}</p>
