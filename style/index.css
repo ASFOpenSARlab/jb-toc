@@ -18,7 +18,7 @@
 
 .jp-Button.toc-button.toc-link {
   /* color: var(--jp-content-link-color); */
-  color: #1a73e8
+  color: #1a73e8;
 }
 
 .jp-Button.toc-chevron:hover {
@@ -107,8 +107,14 @@ div.lm-Widget[id='@jupyterlab-sidepanel/jb-toc'] {
   line-height: 1.4;
 }
 
-.toc-children[hidden] { display: none; }
+.toc-children[hidden] {
+  display: none;
+}
 
-.toc-children { display: block; }
+.toc-children {
+  display: block;
+}
 
-.caption { margin: 0; } 
+.caption {
+  margin: 0;
+}

@@ -57,9 +57,7 @@ export function escHtml(str: string): string {
 }
 
 export function escAttr(str: string): string {
-  return escHtml(str)
-    .replaceAll(/"/g, '&quot;')
-    .replaceAll(/'/g, '&#39;');
+  return escHtml(str).replaceAll(/"/g, '&quot;').replaceAll(/'/g, '&#39;');
 }
 
 async function findConfigInParents(cwd: string): Promise<string | null> {
