@@ -85,7 +85,10 @@ async function findConfigInParents(cwd: string): Promise<string | null> {
   return null;
 }
 
-export async function getFullPath(file_pattern: string, dir_pth: string): Promise<string | null> {
+export async function getFullPath(
+  file_pattern: string,
+  dir_pth: string
+): Promise<string | null> {
   const files = await ls(dir_pth);
   for (const value of Object.values(files.content)) {
     const file = value as FileMetadata;
@@ -181,19 +184,17 @@ export async function formatHtmlForDev(html: string): Promise<string> {
     return html;
   }
 
-  prettierModPromise ??=
-    import('prettier/standalone').catch(err => {
-      prettierModPromise = undefined;
+  prettierModPromise ??= import('prettier/standalone').catch(err => {
+    prettierModPromise = undefined;
+    throw err;
+  });
+
+  htmlPluginPromise ??= import('prettier/plugins/html')
+    .then(m => (m as any).default ?? m)
+    .catch(err => {
+      htmlPluginPromise = undefined;
       throw err;
     });
-
-  htmlPluginPromise ??=
-    import('prettier/plugins/html')
-      .then(m => (m as any).default ?? m)
-      .catch(err => {
-        htmlPluginPromise = undefined;
-        throw err;
-      });
 
   const [prettierMod, htmlPlugin] = await Promise.all([
     prettierModPromise,
