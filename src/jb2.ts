@@ -167,7 +167,7 @@ export async function getHtmlTop(
 }
 
 export async function getHtmlBottom(project: MystProject): Promise<string> {
-  function getDOIUrl(doi: string) {
+  function getDOIHtml(doi: string) {
     if (!doi) {
       return '';
     }
@@ -197,6 +197,43 @@ export async function getHtmlBottom(project: MystProject): Promise<string> {
   </a>`;
   }
 
+  function getGithubHtml(github: string) {
+    let githubUrl: string;
+    let githubLabel: string;
+
+    const githubValue = String(github).trim();
+
+    if (
+      githubValue.startsWith('http://') ||
+      githubValue.startsWith('https://')
+    ) {
+      githubUrl = githubValue;
+      const match = githubValue.match(/github\.com\/([^/]+\/[^/]+)/);
+      githubLabel = match ? match[1] : githubValue;
+    } else {
+      githubLabel = githubValue;
+      githubUrl = `https://github.com/${githubValue}`;
+    }
+
+    const githubEscaped = jbtoc.escAttr(encodeURI(githubLabel));
+
+    return `
+      <a
+        href="${githubUrl}"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="toc-link github-link"
+        aria-label="Open GitHub repository ${githubEscaped} (opens in a new tab)"
+      >
+        <img
+          src="https://img.shields.io/badge/GitHub-5c5c5c?logo=github"
+          alt="GitHub badge for ${githubEscaped}"
+          loading="lazy"
+        >
+      </a>
+    `;
+  }
+
   let html_bottom = '<br><hr class="toc-hr"><br>';
 
   if (Array.isArray(project.authors) && project.authors.length) {
@@ -215,22 +252,7 @@ export async function getHtmlBottom(project: MystProject): Promise<string> {
   }
 
   if (project.github) {
-    const github = jbtoc.escAttr(encodeURI(String(project.github)));
-    html_bottom += `
-      <a
-        href="https://github.com/${github}"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="toc-link github-link"
-        aria-label="Open GitHub repository ${github} (opens in a new tab)"
-      >
-        <img
-          src="https://img.shields.io/badge/GitHub-5c5c5c?logo=github"
-          alt="GitHub badge for ${github}"
-          loading="lazy"
-        >
-      </a>   
-    `;
+    html_bottom += getGithubHtml(project.github);
   }
 
   if (project.license) {
@@ -253,7 +275,7 @@ export async function getHtmlBottom(project: MystProject): Promise<string> {
   }
 
   if (project.doi) {
-    html_bottom += getDOIUrl(project.doi);
+    html_bottom += getDOIHtml(project.doi);
   }
 
   if (project.github || project.license || project.doi) {

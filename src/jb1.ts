@@ -28,7 +28,12 @@ interface Part {
 }
 
 function isJBook1Config(obj: any): obj is JBook1Config {
-  return obj && typeof obj === 'object' && obj.title && obj.author;
+  return (
+    obj &&
+    typeof obj === 'object' &&
+    typeof obj.title === 'string' &&
+    typeof obj.author === 'string'
+  );
 }
 
 export async function getJBook1Config(

@@ -41,8 +41,7 @@ export async function ls(pth: string): Promise<any> {
 
   try {
     const app = getJupyterAppInstance();
-    const data = await app.serviceManager.contents.get(pth, { content: true });
-    return data;
+    return await app.serviceManager.contents.get(pth, { content: true });
   } catch (error) {
     console.error('Error listing directory contents:', error);
     return null;
@@ -50,14 +49,22 @@ export async function ls(pth: string): Promise<any> {
 }
 
 export function escHtml(str: string): string {
-  return str
+  if (str == null) {
+    return '';
+  }
+  const s = String(str);
+  return s
     .replaceAll(/&/g, '&amp;')
     .replaceAll(/</g, '&lt;')
     .replaceAll(/>/g, '&gt;');
 }
 
 export function escAttr(str: string): string {
-  return escHtml(str).replaceAll(/"/g, '&quot;').replaceAll(/'/g, '&#39;');
+  if (str == null) {
+    return '';
+  }
+  const s = String(str);
+  return escHtml(s).replaceAll(/"/g, '&quot;').replaceAll(/'/g, '&#39;');
 }
 
 async function findConfigInParents(cwd: string): Promise<string | null> {
