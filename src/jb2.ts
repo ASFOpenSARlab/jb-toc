@@ -32,10 +32,7 @@ export async function mystTOCToHtml(
   level: number = 1
 ): Promise<string> {
   async function insertFile(file: string, chevron: boolean = false) {
-    const parts = file.split('/');
-    parts.pop();
-    const k_dir = parts.join('/');
-    let pth = await jbtoc.getFullPath(file, `${cwd}${k_dir}`);
+    const pth = await jbtoc.getFullPath(file, cwd);
 
     let title = await jbtoc.getFileTitleFromHeader(String(pth));
     if (!title) {
@@ -121,7 +118,6 @@ export async function mystTOCToHtml(
 
   const html_snippets: string[] = [];
   for (const item of toc) {
-    // const file = item.file ? jbtoc.escAttr(encodeURI(String(item.file))) : '';
     const htmlTitle = item.title ? jbtoc.escHtml(String(item.title)) : '';
     const attrTitle = item.title ? jbtoc.escAttr(String(item.title)) : '';
     const url = item.url ? jbtoc.escAttr(encodeURI(String(item.url))) : '';

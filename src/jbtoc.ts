@@ -7,6 +7,7 @@ import * as jb2 from './jb2';
 
 interface FileMetadata {
   path: string;
+  name: string;
 }
 
 interface Notebook {
@@ -92,19 +93,12 @@ async function findConfigInParents(cwd: string): Promise<string | null> {
   return null;
 }
 
-export async function getFullPath(
-  file_pattern: string,
-  dir_pth: string
-): Promise<string | null> {
-  const files = await ls(dir_pth);
-  for (const value of Object.values(files.content)) {
-    const file = value as FileMetadata;
-    if (file.path.endsWith(file_pattern)) {
-      return file.path;
-    }
+  export function getFullPath(relFile: string, bookRoot: string): string {
+    return path.posix.normalize(
+      (bookRoot.endsWith('/') ? bookRoot : bookRoot + '/') + relFile
+    );
   }
-  return null;
-}
+
 
 function isNotebook(obj: any): obj is Notebook {
   return obj && typeof obj === 'object' && Array.isArray(obj.cells);
@@ -233,8 +227,12 @@ export async function getTOC(cwd: string): Promise<string> {
       const files = await ls(configParent);
       const configPattern = '_config.yml';
       for (const value of Object.values(files.content)) {
+        console.log(value);
+
+
         const file = value as FileMetadata;
-        if (file.path.endsWith(configPattern)) {
+        // if (file.path.endsWith(configPattern)) {
+        if (file.name === configPattern) {
           configPath = file.path;
           break;
         }
