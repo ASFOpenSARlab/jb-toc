@@ -79,7 +79,7 @@ async function getSubSection(
     if (!title) {
       title = file;
     }
-    html += `<button class="jp-Button toc-button tb-level${level}" style="display: block;" data-file-path="${jbtoc.escAttr(encodeURI(String(pth)))}">${jbtoc.escHtml(String(title))}</button>`;
+    html += `<button class="jp-Button toc-button tb-level${level}" data-file-path="${jbtoc.escAttr(encodeURI(String(pth)))}">${jbtoc.escHtml(String(title))}</button>`;
   }
   for (const k of parts) {
     if (k.sections && k.file) {
@@ -96,14 +96,14 @@ async function getSubSection(
       }
       title = jbtoc.escHtml(String(title));
       html += `
-        <div>
-            <button class="jp-Button toc-button 
-              tb-level${level}"style="display: inline-block;" 
+        <div class="toc-row">
+            <button type="button" class="jp-Button toc-button 
+              tb-level${level}" 
               data-file-path="${jbtoc.escAttr(encodeURI(String(pth)))}"
               >${jbtoc.escHtml(String(title))}</button>
-            <button class="jp-Button toc-chevron" style="display: inline-block;"><i class="fa fa-chevron-down "></i></button>
+            <button type="button" class="jp-Button toc-chevron"><i class="fa fa-chevron-down "></i></button>
         </div>
-        <div style="display: none;">
+        <div class="toc-children" hidden>
         `;
       const html_cur = html;
       html = await getSubSection(
@@ -118,12 +118,11 @@ async function getSubSection(
       await insertFile(k.file);
     } else if (k.url) {
       const url = String(jbtoc.escAttr(encodeURI(k.url)));
-      html += `<button class="jp-Button toc-button tb-level${level}" style="display:block;">
+      html += `<button class="jp-Button toc-button toc-link tb-level${level}">
         <a class="toc-link tb-level${level}" 
         href="${jbtoc.escAttr(encodeURI(String(url)))}" 
         target="_blank" 
         rel="noopener noreferrer" 
-        style="display: block;"
         >${jbtoc.escHtml(String(k.title))}</a></button>`;
     } else if (k.glob) {
       const files = await jbtoc.globFiles(`${cwd}${k.glob}`);
