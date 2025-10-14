@@ -36,9 +36,9 @@ export async function mystTOCToHtml(
     parts.pop();
     const k_dir = parts.join('/');
     let pth = await jbtoc.getFullPath(file, `${cwd}${k_dir}`);
-    pth = jbtoc.escAttr(String(pth));
+    // pth = jbtoc.escAttr(String(pth));
 
-    let title = await jbtoc.getFileTitleFromHeader(pth);
+    let title = await jbtoc.getFileTitleFromHeader(String(pth));
     if (!title) {
       title = file;
     }
