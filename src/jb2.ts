@@ -36,7 +36,6 @@ export async function mystTOCToHtml(
     parts.pop();
     const k_dir = parts.join('/');
     let pth = await jbtoc.getFullPath(file, `${cwd}${k_dir}`);
-    // pth = jbtoc.escAttr(String(pth));
 
     let title = await jbtoc.getFileTitleFromHeader(String(pth));
     if (!title) {
@@ -122,21 +121,21 @@ export async function mystTOCToHtml(
 
   const html_snippets: string[] = [];
   for (const item of toc) {
-    const file = item.file ? jbtoc.escAttr(encodeURI(String(item.file))) : '';
+    // const file = item.file ? jbtoc.escAttr(encodeURI(String(item.file))) : '';
     const htmlTitle = item.title ? jbtoc.escHtml(String(item.title)) : '';
     const attrTitle = item.title ? jbtoc.escAttr(String(item.title)) : '';
     const url = item.url ? jbtoc.escAttr(encodeURI(String(item.url))) : '';
 
     if ((item.title || item.file) && item.children) {
       if (item.file) {
-        html_snippets.push(await insertFile(file, true));
+        html_snippets.push(await insertFile(item.file, true));
       } else if (item.title) {
         html_snippets.push(await insertMystTitle(htmlTitle, attrTitle));
       }
       html_snippets.push(await mystTOCToHtml(item.children, cwd, level + 1));
       html_snippets.push('</div>');
     } else if (item.file) {
-      html_snippets.push(await insertFile(file));
+      html_snippets.push(await insertFile(item.file));
     } else if (item.url && item.title) {
       html_snippets.push(await insertUrl(htmlTitle, attrTitle, url));
     } else if (item.glob) {
