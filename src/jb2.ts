@@ -30,18 +30,14 @@ export async function mystTOCToHtml(
   toc: MystTOC[],
   cwd: string,
   level: number = 1
-): Promise<string> {
+): Promise<jbtoc.TOCHTML> {
   async function insertFile(file: string, chevron: boolean = false) {
     const pth = await jbtoc.getFullPath(file, cwd);
-
-    let title = await jbtoc.getFileTitleFromHeader(String(pth));
-    if (!title) {
-      title = file;
-    }
-    const htmlTitle = jbtoc.escHtml(String(title));
-    const attrTitle = jbtoc.escAttr(String(title));
+    pathsSet.add(String(pth));
 
     const sectionId = `sec-${Math.random().toString(36).slice(2)}`;
+    const tHTML = jbtoc.htmlTok(pth);
+    const tATTR = jbtoc.attrTok(pth);
 
     let file_html;
     if (chevron) {
@@ -50,15 +46,15 @@ export async function mystTOCToHtml(
           type="button"
           class="jp-Button toc-button tb-level${level} toc-file"
           data-file-path="${pth}"
-          aria-label="Open ${attrTitle}"
-        ><b>${htmlTitle}</b></button>
+          aria-label="Open ${tATTR}"
+        ><b>${tHTML}</b></button>
 
         <button
           type="button"
           class="jp-Button toc-chevron"
           aria-expanded="false"
           aria-controls="${sectionId}"
-          aria-label="Toggle section for ${attrTitle}"
+          aria-label="Toggle section for ${tATTR}"
         ><i class="fa fa-chevron-down"></i></button>
       </div>
       <div id="${sectionId}" class="toc-children" hidden>
@@ -67,9 +63,9 @@ export async function mystTOCToHtml(
       file_html = `<button
         class="jp-Button toc-button tb-level${level}"
         data-file-path="${pth}"
-        aria-label="Open ${attrTitle}"
+        aria-label="Open ${tATTR}"
       >
-        ${htmlTitle}
+        ${tHTML}
       </button>`;
     }
     return file_html;
@@ -116,6 +112,8 @@ export async function mystTOCToHtml(
     cwd = cwd + '/';
   }
 
+  const pathsSet = new Set<string>();
+
   const html_snippets: string[] = [];
   for (const item of toc) {
     const htmlTitle = item.title ? jbtoc.escHtml(String(item.title)) : '';
@@ -128,7 +126,9 @@ export async function mystTOCToHtml(
       } else if (item.title) {
         html_snippets.push(await insertMystTitle(htmlTitle, attrTitle));
       }
-      html_snippets.push(await mystTOCToHtml(item.children, cwd, level + 1));
+      const children = await mystTOCToHtml(item.children, cwd, level + 1);
+      children.paths.forEach(p => pathsSet.add(p));
+      html_snippets.push(children.html);
       html_snippets.push('</div>');
     } else if (item.file) {
       html_snippets.push(await insertFile(item.file));
@@ -142,7 +142,7 @@ export async function mystTOCToHtml(
       }
     }
   }
-  return html_snippets.join('');
+  return { html: html_snippets.join(''), paths: Array.from(pathsSet) };
 }
 
 export async function getHtmlTop(

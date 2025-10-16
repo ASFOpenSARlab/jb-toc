@@ -1,3 +1,6 @@
+import { ServerConnection } from '@jupyterlab/services';
+import { URLExt } from '@jupyterlab/coreutils';
+
 import * as path from 'path';
 import * as yaml from 'js-yaml';
 import { getJupyterAppInstance } from './index';
@@ -19,6 +22,8 @@ interface Cell {
   metadata: { object: any };
   source: string;
 }
+
+export type TOCHTML = { html: string; paths: string[] };
 
 export async function getFileContents(path: string): Promise<string> {
   try {
@@ -68,6 +73,18 @@ export function escAttr(str: string): string {
   return escHtml(s).replaceAll(/"/g, '&quot;').replaceAll(/'/g, '&#39;');
 }
 
+function encodePath(path: string) {
+  return encodeURIComponent(path);
+}
+// Used to create placeholder tokens for titles on initial toc html generation.
+// They will later be updated with titles effieicently retreived on the backend when possible.
+export function htmlTok(path: string): string {
+  return `[[TITLE_HTML::${encodePath(path)}]]`;
+}
+export function attrTok(path: string): string {
+  return `[[TITLE_ATTR::${encodePath(path)}]]`;
+}
+
 async function findConfigInParents(cwd: string): Promise<string | null> {
   const configPatterns: string[] = ['myst.yml', '_toc.yml'];
   for (const configPattern of configPatterns) {
@@ -93,12 +110,11 @@ async function findConfigInParents(cwd: string): Promise<string | null> {
   return null;
 }
 
-  export function getFullPath(relFile: string, bookRoot: string): string {
-    return path.posix.normalize(
-      (bookRoot.endsWith('/') ? bookRoot : bookRoot + '/') + relFile
-    );
-  }
-
+export function getFullPath(relFile: string, bookRoot: string): string {
+  return path.posix.normalize(
+    (bookRoot.endsWith('/') ? bookRoot : bookRoot + '/') + relFile
+  );
+}
 
 function isNotebook(obj: any): obj is Notebook {
   return obj && typeof obj === 'object' && Array.isArray(obj.cells);
@@ -211,6 +227,73 @@ export async function formatHtmlForDev(html: string): Promise<string> {
   });
 }
 
+function replaceAll(haystack: string, needle: string, replacement: string) {
+  return haystack.split(needle).join(replacement);
+}
+function stem(path: string) {
+  const base = path.split('/').pop() ?? path;
+  return base.replace(/\.[^.]+$/, '');
+}
+
+export async function fetchTitlesBackend(
+  paths: string[]
+): Promise<Record<string, { title: string; last_modified?: string }>> {
+  const settings = ServerConnection.makeSettings();
+  const url = URLExt.join(settings.baseUrl, 'jbtoc', 'titles');
+  const resp = await ServerConnection.makeRequest(
+    url,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paths })
+    },
+    settings
+  );
+
+  if (!resp.ok) {
+    throw new Error(`${resp.status} ${resp.statusText}`);
+  }
+
+  const data = (await resp.json()) as {
+    titles: Record<string, { title?: string; last_modified?: string }>;
+  };
+
+  const out: Record<string, { title: string; last_modified?: string }> = {};
+  for (const [p, v] of Object.entries(data.titles)) {
+    if (v?.title) {
+      out[p] = { title: v.title, last_modified: v.last_modified };
+    }
+  }
+  return out;
+}
+
+async function fetchTitlesFrontend(paths: string[]) {
+  const out: Record<string, { title: string }> = {};
+  for (const p of paths) {
+    try {
+      let t = await getFileTitleFromHeader(String(p));
+      if (!t) t = stem(p);
+      out[p] = { title: String(t) };
+    } catch {
+      out[p] = { title: stem(p) };
+    }
+  }
+  return out;
+}
+
+function applyTitles(
+  html: string,
+  titleMap: Record<string, { title: string }>
+) {
+  for (const [path, { title }] of Object.entries(titleMap)) {
+    const safeHtml = escHtml(String(title));
+    const safeAttr = escAttr(String(title));
+    html = replaceAll(html, htmlTok(path), safeHtml);
+    html = replaceAll(html, attrTok(path), safeAttr);
+  }
+  return html;
+}
+
 export async function getTOC(cwd: string): Promise<string> {
   const tocPath = await findConfigInParents(cwd);
   let configPath = null;
@@ -227,11 +310,7 @@ export async function getTOC(cwd: string): Promise<string> {
       const files = await ls(configParent);
       const configPattern = '_config.yml';
       for (const value of Object.values(files.content)) {
-        console.log(value);
-
-
         const file = value as FileMetadata;
-        // if (file.path.endsWith(configPattern)) {
         if (file.name === configPattern) {
           configPath = file.path;
           break;
@@ -274,7 +353,19 @@ export async function getTOC(cwd: string): Promise<string> {
           const project = yml.project as jb2.MystProject;
 
           const html_top = await jb2.getHtmlTop(project, configParent);
-          const toc_html = await jb2.mystTOCToHtml(project.toc, configParent);
+
+          const { html: tocHtmlRaw, paths } = await jb2.mystTOCToHtml(
+            project.toc,
+            configParent
+          );
+          let map: Record<string, { title: string; last_modified?: string }>;
+          try {
+            map = await fetchTitlesBackend(paths);
+          } catch {
+            map = await fetchTitlesFrontend(paths);
+          }
+          const toc_html = applyTitles(tocHtmlRaw, map);
+
           const html_bottom = await jb2.getHtmlBottom(project);
 
           html = `

@@ -1,0 +1,53 @@
+[build-system]
+# include hatch-nodejs-version so Hatch can read version from package.json
+requires = ["hatchling>=1.5.0", "hatch-nodejs-version>=0.3.2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jb_toc_server"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+classifiers = [
+    "Framework :: Jupyter",
+    "Framework :: Jupyter :: JupyterLab",
+    "Framework :: Jupyter :: JupyterLab :: 4",
+    "Framework :: Jupyter :: JupyterLab :: Extensions",
+    "Framework :: Jupyter :: JupyterLab :: Extensions :: Prebuilt",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "jupyter-server>=2.0.0"
+    ]
+description = "Server extension providing /jbtoc/titles for jb_toc"
+dynamic = ["version", "keywords"]
+
+[tool.hatch.version]
+source = "nodejs"
+
+[project.entry-points."jupyter_server.extension"]
+jb_toc_server = "jb_toc_server"
+
+[tool.hatch.version.nodejs]
+path = "package.json"
+
+[tool.hatch.build.hooks.version]
+path = "jb_toc_server/_version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["jb_toc_server"]
+
+[tool.jupyter-releaser.options]
+version_cmd = "hatch version"
+
+[tool.check-wheel-contents]
+ignore = ["W002"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"jb_toc_server/jupyter-config/jupyter_server_config.d/jb_toc_server.json" = "etc/jupyter/jupyter_server_config.d/jb_toc_server.json"
