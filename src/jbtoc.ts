@@ -272,7 +272,9 @@ async function fetchTitlesFrontend(paths: string[]) {
   for (const p of paths) {
     try {
       let t = await getFileTitleFromHeader(String(p));
-      if (!t) t = stem(p);
+      if (!t) {
+        t = stem(p);
+      }
       out[p] = { title: String(t) };
     } catch {
       out[p] = { title: stem(p) };
