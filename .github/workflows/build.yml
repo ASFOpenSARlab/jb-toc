@@ -60,7 +60,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: extension-artifacts
-        path: dist/jb_toc*
+        path: jb_toc/dist/jb_toc*
         if-no-files-found: error
 
   test_isolated:
