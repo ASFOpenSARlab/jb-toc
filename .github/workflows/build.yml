@@ -57,6 +57,7 @@ jobs:
         pip uninstall -y "jb_toc" jupyterlab
 
     - name: Upload extension packages
+      working-directory: jb_toc
       uses: actions/upload-artifact@v4
       with:
         name: extension-artifacts
