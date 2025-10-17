@@ -1,5 +1,10 @@
 [options]
-version_cmd = "hatch version"
+version_cmd = "bash -lc 'cd jb_toc && hatch version'"
+
+version_path = "jb_toc/package.json"
+version_regex = "\"version\"\\s*:\\s*\"([^\"]+)\""
+
+changelog_path = "CHANGELOG.md"
 
 python_packages = [
   "jb_toc"
@@ -8,3 +13,4 @@ python_packages = [
 [hooks]
 before-build-npm = []
 before-build-python = []
+
