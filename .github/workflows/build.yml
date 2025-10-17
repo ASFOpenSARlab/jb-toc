@@ -20,6 +20,10 @@ jobs:
     - name: Install dependencies
       run: python -m pip install -U "jupyterlab>=4.0.0,<5"
 
+    - name: Install JS deps
+      working-directory: jb_toc
+      run: jlpm install
+
     - name: Lint the extension
       run: |
         set -eux
@@ -34,7 +38,7 @@ jobs:
     - name: Build the extension
       run: |
         set -eux
-        python -m pip install .[test]
+        python -m pip install ./jb_toc[test]
 
         jupyter labextension list
         jupyter labextension list 2>&1 | grep -ie "jb-toc.*OK"

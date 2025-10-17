@@ -52,8 +52,8 @@ packages = ["jb_toc"]
 [tool.hatch.build.hooks.jupyter-builder]
 dependencies = ["hatch-jupyter-builder>=0.5"]
 build-function = "hatch_jupyter_builder.npm_builder"
-ensured-targets = ["labextension/static/remoteEntry.js"]
-skip-if-exists = ["labextension/static/remoteEntry.js"]
+ensured-targets = ["labextension/package.json"]
+skip-if-exists   = ["labextension/package.json"]
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
 path = "."
