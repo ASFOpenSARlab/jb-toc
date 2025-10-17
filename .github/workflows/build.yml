@@ -23,11 +23,14 @@ jobs:
     - name: Cache JS deps (jb_toc)
       uses: actions/cache@v4
       with:
-        path: jb_toc/node_modules
+        path: |
+          jb_toc/node_modules
+          jb_toc/.yarn/cache
+          ~/.cache/yarn
         key: ${{ runner.os }}-yarn-${{ hashFiles('jb_toc/yarn.lock') }}
         restore-keys: |
-          ${{ runner.os }}-yarn-      
-
+          ${{ runner.os }}-yarn-
+     
     - name: Install JS deps
       working-directory: jb_toc
       run: jlpm install
