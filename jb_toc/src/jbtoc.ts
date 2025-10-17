@@ -111,6 +111,8 @@ async function findConfigInParents(cwd: string): Promise<string | null> {
 }
 
 export function getFullPath(relFile: string, bookRoot: string): string {
+  // const fullPath = new URL(relFile, bookRoot + '/').pathname;
+  // console.log(fullPath);
   return path.posix.normalize(
     (bookRoot.endsWith('/') ? bookRoot : bookRoot + '/') + relFile
   );
@@ -230,6 +232,7 @@ export async function formatHtmlForDev(html: string): Promise<string> {
 function replaceAll(haystack: string, needle: string, replacement: string) {
   return haystack.split(needle).join(replacement);
 }
+
 function stem(path: string) {
   const base = path.split('/').pop() ?? path;
   return base.replace(/\.[^.]+$/, '');

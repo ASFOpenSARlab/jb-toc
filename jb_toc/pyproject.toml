@@ -4,9 +4,9 @@ build-backend = "hatchling.build"
 
 [project]
 name = "jb_toc"
-readme = "../README.md"
-license = { file = "../LICENSE" }
-requires-python = ">=3.9"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
 classifiers = [
     "Framework :: Jupyter",
     "Framework :: Jupyter :: JupyterLab",
@@ -46,19 +46,22 @@ exclude = [".github", "binder"]
 [tool.hatch.build.hooks.version]
 path = "jb_toc/_version.py"
 
+[tool.hatch.build.targets.wheel]
+packages = ["jb_toc"]
+
 [tool.hatch.build.hooks.jupyter-builder]
 dependencies = ["hatch-jupyter-builder>=0.5"]
 build-function = "hatch_jupyter_builder.npm_builder"
-ensured-targets = ["labextension/package.json"]
-skip-if-exists = ["labextension/package.json"]
+ensured-targets = ["labextension/static/remoteEntry.js"]
+skip-if-exists = ["labextension/static/remoteEntry.js"]
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
-path = ".."
+path = "."
 build_cmd = "build:prod"
 npm = ["jlpm"]
 
 [tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
-path = ".."
+path = "."
 build_cmd = "install:extension"
 npm = ["jlpm"]
 source_dir = "src"
@@ -78,5 +81,3 @@ before-build-python = ["jlpm clean:all"]
 [tool.check-wheel-contents]
 ignore = ["W002"]
 
-[tool.hatch.build.targets.wheel]
-packages = ["jb_toc"]
