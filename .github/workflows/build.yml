@@ -25,26 +25,30 @@ jobs:
       run: jlpm install
 
     - name: Lint the extension
+      working-directory: jb_toc
       run: |
         set -eux
         jlpm
         jlpm run lint:check
 
     - name: Test the extension
+      working-directory: jb_toc
       run: |
         set -eux
         jlpm run test
 
     - name: Build the extension
+      working-directory: jb_toc
       run: |
         set -eux
-        python -m pip install ./jb_toc[test]
+        python -m pip install .[test]
 
         jupyter labextension list
         jupyter labextension list 2>&1 | grep -ie "jb-toc.*OK"
         python -m jupyterlab.browser_check
 
     - name: Package the extension
+      working-directory: jb_toc
       run: |
         set -eux
 
