@@ -119,6 +119,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: extension-artifacts
+        path: jb_toc
 
     - name: Install the extension
       working-directory: jb_toc
