@@ -20,15 +20,15 @@ jobs:
       - name: Install jupyter-releaser
         run: python -m pip install jupyter-releaser
       - name: Check Release
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -eux
           jupyter-releaser prep-git
           jupyter-releaser check-links
           jupyter-releaser check-manifest
-          jupyter-releaser build-python
           jupyter-releaser build-npm
+          jupyter-releaser build-python
           jupyter-releaser twine-check
           jupyter-releaser check-release
       - name: Upload Distributions
