@@ -1,0 +1,10 @@
+[options]
+version_cmd = "hatch version"
+
+python_packages = [
+  "jb_toc"
+]
+
+[hooks]
+before-build-npm = []
+before-build-python = []
