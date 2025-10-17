@@ -19,12 +19,20 @@ jobs:
         uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
       - name: Check Release
         uses: jupyter-server/jupyter_releaser/.github/actions/check-release@v2
-        env:
-          RH_SKIP: bump-version,build-changelog 
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -eux
+          jupyter-releaser prep-git
+          jupyter-releaser check-links
+          jupyter-releaser check-manifest
+          jupyter-releaser build-python
+          jupyter-releaser build-npm
+          jupyter-releaser twine-check
+          jupyter-releaser check-release
       - name: Upload Distributions
         uses: actions/upload-artifact@v4
         with:
           name: jb_toc-releaser-dist-${{ github.run_number }}
           path: .jupyter_releaser_checkout/dist
+          
