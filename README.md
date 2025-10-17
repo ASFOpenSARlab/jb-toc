@@ -1,4 +1,4 @@
-# jupyterlab_jupyterbook_navigation
+# jb_toc
 
 [![Github Actions Status](https://github.com/ASFOpenSARlab/jb-toc/workflows/Build/badge.svg)](https://github.com/ASFOpenSARlab/jb-toc/actions/workflows/build.yml)[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ASFOpenSARlab/jb-toc/main?urlpath=lab)
 [![lite-badge](https://jupyterlite.rtfd.io/en/latest/_static/badge.svg)](https://alex-lewandowski.github.io/JupyterLite-demo/lab/index.html)

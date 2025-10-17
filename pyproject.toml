@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling>=1.5.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jb_toc"
+version = "0.0.0"
+
+[tool.jupyter-releaser.options]
+version_spec   = "major"
+version_cmd  = 'bash -lc "python \"$(git rev-parse --show-toplevel)/scripts/sync_version.py\" --version $0"'
+npm_command = 'bash -lc "jlpm --cwd \"$(git rev-parse --show-toplevel)/jb_toc\" install --immutable && jlpm --cwd \"$(git rev-parse --show-toplevel)/jb_toc\" build:prod"'
+python_packages = ["jb_toc", "jb_toc_server"]
+changelog_path = "CHANGELOG.md"
+
+[tool.jupyter-releaser.hooks]
+before-build-python = [
+  "python scripts/sync_version.py",
+  "echo synching version with before-build-python",
+  'bash -lc "cd \"$(git rev-parse --show-toplevel)/jb_toc\" && jlpm clean:all"'
+]
+before-build-npm = [
+  "python -m pip install 'jupyterlab>=4.0.0,<5'",
+  "python scripts/sync_version.py",
+  "echo synching version with before-build-npm",
+  'bash -lc "cd \"$(git rev-parse --show-toplevel)/jb_toc\" && jlpm install --immutable"',
+  'bash -lc "cd \"$(git rev-parse --show-toplevel)/jb_toc\" && jlpm build:prod"'
+]
+before-build-changelog = [
+    "python scripts/sync_version.py",
+    "echo synching version with before-build-changelog"
+    ]
+before-bump-version = [
+  'bash -lc "echo synching version with before-bump-version"',
+  'bash -lc "pwd"',
+  'bash -lc "python \"$(git rev-parse --show-toplevel)/scripts/sync_version.py\""'
+]

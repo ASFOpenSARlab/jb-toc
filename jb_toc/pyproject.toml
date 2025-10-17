@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling>=1.5.0", "jupyterlab>=4.0.0,<5", "hatch-nodejs-version>=0.3.2"]
+requires = ["hatchling>=1.5.0", "jupyterlab>=4.0.0,<5"]
 build-backend = "hatchling.build"
 
 [project]
@@ -7,6 +7,7 @@ name = "jb_toc"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.10"
+version = "0.0.0"
 classifiers = [
     "Framework :: Jupyter",
     "Framework :: Jupyter :: JupyterLab",
@@ -24,16 +25,9 @@ classifiers = [
 dependencies = [
     "jupyter-server-globbing",
 ]
-dynamic = ["version", "description", "authors", "urls", "keywords"]
 
-[tool.hatch.version]
-source = "nodejs"
-
-[tool.hatch.version.nodejs]
-path = "package.json"
-
-[tool.hatch.metadata.hooks.nodejs]
-fields = ["description", "authors", "urls"]
+description = "Frontend Jupyter Lab extension providing Jupyter Book Table of Contents in Jupyter Lab"
+keywords = ["jupyter", "jupyterlab", "toc", "jupyter_book"]
 
 [tool.hatch.build.targets.sdist]
 artifacts = ["labextension"]
@@ -42,9 +36,6 @@ exclude = [".github", "binder"]
 [tool.hatch.build.targets.wheel.shared-data]
 "labextension" = "share/jupyter/labextensions/jb-toc"
 "install.json" = "share/jupyter/labextensions/jb-toc/install.json"
-
-[tool.hatch.build.hooks.version]
-path = "jb_toc/_version.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["jb_toc"]
@@ -66,17 +57,6 @@ build_cmd = "install:extension"
 npm = ["jlpm"]
 source_dir = "src"
 build_dir = "labextension"
-
-[tool.jupyter-releaser.options]
-version_cmd = "hatch version"
-
-[tool.jupyter-releaser.hooks]
-before-build-npm = [
-    "python -m pip install 'jupyterlab>=4.0.0,<5'",
-    "jlpm",
-    "jlpm build:prod"
-]
-before-build-python = ["jlpm clean:all"]
 
 [tool.check-wheel-contents]
 ignore = ["W002"]

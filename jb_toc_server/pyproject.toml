@@ -1,6 +1,5 @@
 [build-system]
-# include hatch-nodejs-version so Hatch can read version from package.json
-requires = ["hatchling>=1.5.0", "hatch-nodejs-version>=0.3.2"]
+requires = ["hatchling>=1.5.0"]
 build-backend = "hatchling.build"
 
 [project]
@@ -8,6 +7,7 @@ name = "jb_toc_server"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.10"
+version = "0.0.0"
 classifiers = [
     "Framework :: Jupyter",
     "Framework :: Jupyter :: JupyterLab",
@@ -26,25 +26,14 @@ dependencies = [
     "jupyter-server>=2.0.0"
     ]
 description = "Server extension providing /jbtoc/titles for jb_toc"
-dynamic = ["version", "keywords"]
-
-[tool.hatch.version]
-source = "nodejs"
+keywords = ["jupyter", "jupyterlab", "toc", "jupyter_book"]
 
 [project.entry-points."jupyter_server.extension"]
 jb_toc_server = "jb_toc_server"
 
-[tool.hatch.version.nodejs]
-path = "package.json"
-
-[tool.hatch.build.hooks.version]
-path = "jb_toc_server/_version.py"
-
 [tool.hatch.build.targets.wheel]
 packages = ["jb_toc_server"]
-
-[tool.jupyter-releaser.options]
-version_cmd = "hatch version"
+exclude = ["jb_toc_server/jupyter-config/jupyter_server_config.d/jb_toc_server.json"]
 
 [tool.check-wheel-contents]
 ignore = ["W002"]
