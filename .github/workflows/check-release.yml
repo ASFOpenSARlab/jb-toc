@@ -42,5 +42,5 @@ jobs:
       - name: Upload Distributions
         uses: actions/upload-artifact@v4
         with:
-          name: jb_toc-releaser-dist-${{ github.run_number }}
+          name: jb_toc_frontend-releaser-dist-${{ github.run_number }}
           path: .jupyter_releaser_checkout/dist

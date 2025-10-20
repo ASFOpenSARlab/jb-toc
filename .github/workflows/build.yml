@@ -20,58 +20,58 @@ jobs:
     - name: Install dependencies
       run: python -m pip install -U "jupyterlab>=4.0.0,<5"
 
-    - name: Cache JS deps (jb_toc)
+    - name: Cache JS deps (jb_toc_frontend)
       uses: actions/cache@v4
       with:
         path: |
-          jb_toc/node_modules
-          jb_toc/.yarn/cache
+          jb_toc_frontend/node_modules
+          jb_toc_frontend/.yarn/cache
           ~/.cache/yarn
-        key: ${{ runner.os }}-yarn-${{ hashFiles('jb_toc/yarn.lock') }}
+        key: ${{ runner.os }}-yarn-${{ hashFiles('jb_toc_frontend/yarn.lock') }}
         restore-keys: |
           ${{ runner.os }}-yarn-
      
     - name: Install JS deps
-      working-directory: jb_toc
+      working-directory: jb_toc_frontend
       run: jlpm install
 
     - name: Lint the extension
-      working-directory: jb_toc
+      working-directory: jb_toc_frontend
       run: |
         set -eux
         jlpm
         jlpm run lint:check
 
     - name: Test the extension
-      working-directory: jb_toc
+      working-directory: jb_toc_frontend
       run: |
         set -eux
         jlpm run test
 
     - name: Build the extension
-      working-directory: jb_toc
+      working-directory: jb_toc_frontend
       run: |
         set -eux
         python -m pip install .[test]
 
         jupyter labextension list
-        jupyter labextension list 2>&1 | grep -ie "jb-toc.*OK"
+        jupyter labextension list 2>&1 | grep -ie "jb-toc-frontend.*OK"
         python -m jupyterlab.browser_check
 
     - name: Package the extension
-      working-directory: jb_toc
+      working-directory: jb_toc_frontend
       run: |
         set -eux
 
         pip install build
         python -m build
-        pip uninstall -y "jb_toc" jupyterlab
+        pip uninstall -y "jb_toc_frontend" jupyterlab
 
     - name: Upload extension packages
       uses: actions/upload-artifact@v4
       with:
         name: extension-artifacts
-        path: jb_toc/dist/jb_toc*
+        path: jb_toc_frontend/dist/jb_toc_frontend*
         if-no-files-found: error
 
   test_isolated:
@@ -94,10 +94,10 @@ jobs:
         sudo rm -rf $(which node)
         sudo rm -rf $(which node)
 
-        pip install "jupyterlab>=4.0.0,<5" jb_toc*.whl
+        pip install "jupyterlab>=4.0.0,<5" jb_toc_frontend*.whl
 
         jupyter labextension list
-        jupyter labextension list 2>&1 | grep -ie "jb-toc.*OK"
+        jupyter labextension list 2>&1 | grep -ie "jb-toc-frontend.*OK"
         python -m jupyterlab.browser_check --no-browser-test
 
   integration-tests:
@@ -119,13 +119,13 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: extension-artifacts
-        path: jb_toc
+        path: jb_toc_frontend
 
     - name: Install the extension
-      working-directory: jb_toc
+      working-directory: jb_toc_frontend
       run: |
         set -eux
-        python -m pip install "jupyterlab>=4.0.0,<5" jb_toc*.whl
+        python -m pip install "jupyterlab>=4.0.0,<5" jb_toc_frontend*.whl
 
     - name: Install dependencies (ui-tests)
       working-directory: ui-tests
@@ -163,7 +163,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: jb_toc-playwright-tests
+        name: jb_toc_frontend-playwright-tests
         path: |
           ui-tests/test-results
           ui-tests/playwright-report
