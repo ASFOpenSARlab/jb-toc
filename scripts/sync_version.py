@@ -61,11 +61,11 @@ def update_pyproject(pyproj_path: Path, pep440_version: str) -> bool:
 
 def main():
     root = Path(__file__).resolve().parents[1]
-    pkg_json = root / "jb_toc/package.json"
+    pkg_json = root / "jb_toc_frontend/package.json"
     pyproject_paths = [
         root / "pyproject.toml",
+        root / "jb_toc_frontend/pyproject.toml",
         root / "jb_toc/pyproject.toml",
-        root / "jb_toc_server/pyproject.toml",
     ]
     version_txt_path = root / "VERSION"
 

@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 
 root = os.popen("git rev-parse --show-toplevel").read().strip()
-ver = json.loads(Path(root, "jb_toc", "package.json").read_text())["version"]
+ver = json.loads(Path(root, "jb_toc_frontend", "package.json").read_text())["version"]
 
 # npm "1.0.4-dev0" -> PEP 440 "1.0.4.dev0"
 if "-dev" in ver:

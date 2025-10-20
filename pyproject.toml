@@ -9,7 +9,7 @@ version = "0.0.0"
 [tool.jupyter-releaser.options]
 version_spec   = "major"
 version_cmd  = 'bash -lc "python \"$(git rev-parse --show-toplevel)/scripts/sync_version.py\" --version $0"'
-npm_command = 'bash -lc "jlpm --cwd \"$(git rev-parse --show-toplevel)/jb_toc\" install --immutable && jlpm --cwd \"$(git rev-parse --show-toplevel)/jb_toc\" build:prod"'
+npm_command = 'bash -lc "jlpm --cwd \"$(git rev-parse --show-toplevel)/jb_toc_frontend\" install --immutable && jlpm --cwd \"$(git rev-parse --show-toplevel)/jb_toc_frontend\" build:prod"'
 python_packages = ["jb_toc_frontend", "jb_toc"]
 changelog_path = "CHANGELOG.md"
 
@@ -17,14 +17,14 @@ changelog_path = "CHANGELOG.md"
 before-build-python = [
   "python scripts/sync_version.py",
   "echo synching version with before-build-python",
-  'bash -lc "cd \"$(git rev-parse --show-toplevel)/jb_toc\" && jlpm clean:all"'
+  'bash -lc "cd \"$(git rev-parse --show-toplevel)/jb_toc_frontend\" && jlpm clean:all"'
 ]
 before-build-npm = [
   "python -m pip install 'jupyterlab>=4.0.0,<5'",
   "python scripts/sync_version.py",
   "echo synching version with before-build-npm",
-  'bash -lc "cd \"$(git rev-parse --show-toplevel)/jb_toc\" && jlpm install --immutable"',
-  'bash -lc "cd \"$(git rev-parse --show-toplevel)/jb_toc\" && jlpm build:prod"'
+  'bash -lc "cd \"$(git rev-parse --show-toplevel)/jb_toc_frontend\" && jlpm install --immutable"',
+  'bash -lc "cd \"$(git rev-parse --show-toplevel)/jb_toc_frontend\" && jlpm build:prod"'
 ]
 before-build-changelog = [
     "python scripts/sync_version.py",
