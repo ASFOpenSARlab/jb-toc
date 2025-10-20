@@ -1,0 +1,63 @@
+[build-system]
+requires = ["hatchling>=1.5.0", "jupyterlab>=4.0.0,<5"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jb_toc_frontend"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+version = "0.0.0"
+classifiers = [
+    "Framework :: Jupyter",
+    "Framework :: Jupyter :: JupyterLab",
+    "Framework :: Jupyter :: JupyterLab :: 4",
+    "Framework :: Jupyter :: JupyterLab :: Extensions",
+    "Framework :: Jupyter :: JupyterLab :: Extensions :: Prebuilt",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "jupyter-server-globbing",
+]
+
+description = "Frontend Jupyter Lab extension providing Jupyter Book Table of Contents in Jupyter Lab"
+keywords = ["jupyter", "jupyterlab", "toc", "jupyter_book"]
+
+[tool.hatch.build.targets.sdist]
+artifacts = ["labextension"]
+exclude = [".github", "binder"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"labextension" = "share/jupyter/labextensions/jb-toc-frontend"
+"install.json" = "share/jupyter/labextensions/jb-toc-frontend/install.json"
+
+[tool.hatch.build.targets.wheel]
+packages = ["jb_toc_frontend"]
+
+[tool.hatch.build.hooks.jupyter-builder]
+dependencies = ["hatch-jupyter-builder>=0.5"]
+build-function = "hatch_jupyter_builder.npm_builder"
+ensured-targets = ["labextension/package.json"]
+skip-if-exists   = ["labextension/package.json"]
+
+[tool.hatch.build.hooks.jupyter-builder.build-kwargs]
+path = "."
+build_cmd = "build:prod"
+npm = ["jlpm"]
+
+[tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
+path = "."
+build_cmd = "install:extension"
+npm = ["jlpm"]
+source_dir = "src"
+build_dir = "labextension"
+
+[tool.check-wheel-contents]
+ignore = ["W002"]
+

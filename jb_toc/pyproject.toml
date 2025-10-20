@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling>=1.5.0", "jupyterlab>=4.0.0,<5"]
+requires = ["hatchling>=1.5.0"]
 build-backend = "hatchling.build"
 
 [project]
@@ -23,41 +23,20 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "jupyter-server-globbing",
-]
-
-description = "Frontend Jupyter Lab extension providing Jupyter Book Table of Contents in Jupyter Lab"
+    "jupyter-server>=2.0.0"
+    ]
+description = "Server extension providing /jbtoc/titles for jb_toc_frontend, if Jupyter Server is available."
 keywords = ["jupyter", "jupyterlab", "toc", "jupyter_book"]
 
-[tool.hatch.build.targets.sdist]
-artifacts = ["labextension"]
-exclude = [".github", "binder"]
-
-[tool.hatch.build.targets.wheel.shared-data]
-"labextension" = "share/jupyter/labextensions/jb-toc"
-"install.json" = "share/jupyter/labextensions/jb-toc/install.json"
+[project.entry-points."jupyter_server.extension"]
+jb_toc = "jb_toc"
 
 [tool.hatch.build.targets.wheel]
 packages = ["jb_toc"]
-
-[tool.hatch.build.hooks.jupyter-builder]
-dependencies = ["hatch-jupyter-builder>=0.5"]
-build-function = "hatch_jupyter_builder.npm_builder"
-ensured-targets = ["labextension/package.json"]
-skip-if-exists   = ["labextension/package.json"]
-
-[tool.hatch.build.hooks.jupyter-builder.build-kwargs]
-path = "."
-build_cmd = "build:prod"
-npm = ["jlpm"]
-
-[tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
-path = "."
-build_cmd = "install:extension"
-npm = ["jlpm"]
-source_dir = "src"
-build_dir = "labextension"
+exclude = ["jb_toc/jupyter-config/jupyter_server_config.d/jb_toc.json"]
 
 [tool.check-wheel-contents]
 ignore = ["W002"]
 
+[tool.hatch.build.targets.wheel.shared-data]
+"jb_toc/jupyter-config/jupyter_server_config.d/jb_toc.json" = "etc/jupyter/jupyter_server_config.d/jb_toc.json"
