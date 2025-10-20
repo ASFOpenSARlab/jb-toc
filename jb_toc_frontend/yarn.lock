@@ -6534,9 +6534,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jb-toc@workspace:.":
+"jb-toc-frontend@workspace:.":
   version: 0.0.0-use.local
-  resolution: "jb-toc@workspace:."
+  resolution: "jb-toc-frontend@workspace:."
   dependencies:
     "@jupyterlab/application": ^4.0.0
     "@jupyterlab/builder": ^4.0.0
