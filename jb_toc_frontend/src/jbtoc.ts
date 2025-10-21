@@ -1,7 +1,6 @@
 import { ServerConnection } from '@jupyterlab/services';
 import { URLExt } from '@jupyterlab/coreutils';
 
-import * as path from 'path';
 import * as yaml from 'js-yaml';
 import { getJupyterAppInstance } from './index';
 
@@ -110,10 +109,17 @@ async function findConfigInParents(cwd: string): Promise<string | null> {
   return null;
 }
 
+export function normalize(p: string): string {
+  return p.replace(/\\/g, '/').replace(/\/{2,}/g, '/');
+}
+
+export function extname(p: string): string {
+  const match = /\.([^.\/\\]+)$/.exec(p);
+  return match ? '.' + match[1] : '';
+}
+
 export function getFullPath(relFile: string, bookRoot: string): string {
-  // const fullPath = new URL(relFile, bookRoot + '/').pathname;
-  // console.log(fullPath);
-  return path.posix.normalize(
+  return normalize(
     (bookRoot.endsWith('/') ? bookRoot : bookRoot + '/') + relFile
   );
 }
@@ -125,7 +131,7 @@ function isNotebook(obj: any): obj is Notebook {
 export async function getFileTitleFromHeader(
   filePath: string
 ): Promise<string | null> {
-  const suffix = path.extname(filePath);
+  const suffix = extname(filePath);
   if (suffix === '.ipynb') {
     try {
       const jsonData: Notebook | string = await getFileContents(filePath);
