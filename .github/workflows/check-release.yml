@@ -36,6 +36,8 @@ jobs:
           RH_VERSION_SPEC: major
           RH_REF: ${{ github.sha }}
           RH_BRANCH: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          PIP_FIND_LINKS: ${{ github.workspace }}/.jupyter_releaser_checkout/dist
+          PIP_NO_INDEX: "0"
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
