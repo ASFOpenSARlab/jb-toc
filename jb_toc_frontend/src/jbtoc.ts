@@ -414,7 +414,7 @@ export async function getTOC(cwd: string): Promise<string> {
     }
     const stack =
       (html instanceof Error && html.stack) ||
-        (typeof html === 'object' && 'stack' in (html ?? {}))
+      (typeof html === 'object' && 'stack' in (html ?? {}))
         ? (html as any).stack
         : '';
 
