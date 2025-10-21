@@ -4,10 +4,11 @@ build-backend = "hatchling.build"
 
 [project]
 name = "jb_toc_frontend"
+version = "0.0.0"
+
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.10"
-version = "1.0.5.dev0"
 
 classifiers = [
     "Framework :: Jupyter",
@@ -24,7 +25,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "jupyter-server-globbing",
+    "jupyter-server-globbing"
 ]
 
 description = "Frontend Jupyter Lab extension providing Jupyter Book Table of Contents in Jupyter Lab"

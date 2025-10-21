@@ -12,6 +12,7 @@ SEMVER = re.compile(
 
 PROJECT_TABLE_RE = re.compile(r'(?ms)^\[project\]\s*(?P<body>.*?)(?=^\[[^\]]+\]|\Z)')
 VERSION_LINE_RE = re.compile(r'(?m)^\s*version\s*=\s*([\'"])(?P<ver>.*?)(\1)\s*$')
+FRONTEND_DEP_RE = re.compile(r'(?m)^[ \t]*"jb_toc_frontend\s*==\s*(?P<ver>[^"]+)"[ \t]*,?$')
 
 def npm_to_pep440(v: str) -> str:
     m = SEMVER.match(v or "")
@@ -49,11 +50,38 @@ def ensure_project_version(pyproj_text: str, pep440_version: str) -> str:
     new_project_block = f"[project]\n{body}"
     return pyproj_text[:start] + new_project_block + pyproj_text[end:]
 
-def update_pyproject(pyproj_path: Path, pep440_version: str) -> bool:
+def ensure_project_dep(pyproj_text: str, pep440_version: str) -> str:
+    """
+    Update jb_toc_frontend dependency version in jb_toc/pyproject.toml
+    """
+    m = PROJECT_TABLE_RE.search(pyproj_text)
+ 
+    start, end = m.span()
+    body = m.group('body')
+
+    if FRONTEND_DEP_RE.search(body):
+        body = FRONTEND_DEP_RE.sub(f'    "jb_toc_frontend=={pep440_version}"\n', body, count=1)
+    else:
+        if body and not body.startswith("\n"):
+            body = "\n" + body
+        body = f'\n"    jb_toc_frontend=={pep440_version}"{body}'
+
+    new_project_block = f"[project]\n{body}"
+    return pyproj_text[:start] + new_project_block + pyproj_text[end:]
+
+def update_pyproj_version(pyproj_path: Path, pep440_version: str) -> bool:
     if not pyproj_path.exists():
         return False
     original = pyproj_path.read_text(encoding="utf-8")
     updated = ensure_project_version(original, pep440_version)
+    if updated != original:
+        pyproj_path.write_text(updated, encoding="utf-8")
+        return True
+    return False
+
+def update_pyproj_dep(pyproj_path: Path, pep440_version: str) -> bool:
+    original = pyproj_path.read_text(encoding="utf-8")
+    updated = ensure_project_dep(original, pep440_version)
     if updated != original:
         pyproj_path.write_text(updated, encoding="utf-8")
         return True
@@ -67,7 +95,6 @@ def main():
         root / "jb_toc_frontend/pyproject.toml",
         root / "jb_toc/pyproject.toml",
     ]
-    version_txt_path = root / "VERSION"
 
     data = json.loads(pkg_json.read_text(encoding="utf-8"))
     version = data.get("version")
@@ -77,17 +104,17 @@ def main():
 
     pep_version = npm_to_pep440(version)
 
-    version_txt_path.write_text(pep_version + "\n", encoding="utf-8")
-
     updated = []
     for p in pyproject_paths:
-        if update_pyproject(p, pep_version):
+        if update_pyproj_version(p, pep_version):
             updated.append(p)
+        if "jb_toc" in str(p) and "frontend" not in str(p):
+            update_pyproj_dep(p, pep_version)
 
-    print(f"Wrote version {pep_version} to:")
-    print(f" - {version_txt_path.relative_to(root)}")
-    for p in updated:
-        print(f" - {p.relative_to(root)} (pyproject.toml)")
+    if len(updated) > 0:
+        print(f"Wrote version {pep_version} to:")
+        for p in updated:
+            print(f" - {p.relative_to(root)} (pyproject.toml)")
 
 if __name__ == "__main__":
     main()

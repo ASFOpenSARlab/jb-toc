@@ -21,9 +21,6 @@ def install_wheel(wheel_path: str) -> None:
 
 
 def main():
-    root = Path(__file__).resolve().parents[1]
-    dist = root / "dist"
-
     frontend_wheel = pick_latest("jb_toc_frontend-*.whl")
     jb_toc_wheel = pick_latest("jb_toc-*.whl")
 
