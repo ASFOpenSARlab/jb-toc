@@ -1,7 +1,7 @@
 {
   "ServerApp": {
     "jpserver_extensions": {
-      "jb_toc_server": true
+      "jb_toc": true
     }
   }
 }
