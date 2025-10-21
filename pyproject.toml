@@ -4,8 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "jb_toc_frontend"
-version = "0.0.0"
-
+version = "1.0.5.dev0"
 [tool.jupyter-releaser.options]
 version_spec   = "major"
 version_cmd  = 'bash -lc "python \"$(git rev-parse --show-toplevel)/scripts/sync_version.py\" --version $0"'
@@ -35,3 +34,8 @@ before-bump-version = [
   'bash -lc "pwd"',
   'bash -lc "python \"$(git rev-parse --show-toplevel)/scripts/sync_version.py\""'
 ]
+after-build-python = [
+  # Make sure jb_toc_frontend build artifacts are in ./dist 
+  "python - <<'PY'\nfrom pathlib import Path\nimport subprocess\nfrom packaging.version import Version\nwheels = sorted(Path('dist').glob('jb_toc_frontend-*.whl'), key=lambda p: Version(p.name.split('-')[1]))\nassert wheels, 'no jb_toc_frontend wheel found in dist/'\nsubprocess.check_call(['python','-m','pip','install','--no-index','--find-links','dist', str(wheels[-1])])\nPY",
+]
+
