@@ -35,10 +35,6 @@ before-bump-version = [
   'bash -lc "python \"$(git rev-parse --show-toplevel)/scripts/sync_version.py\""'
 ]
 after-build-python = [
-  # Make sure jb_toc_frontend build artifacts are in ./dist 
-  "python - <<'PY'\nfrom pathlib import Path\nfrom packaging.version import Version\nwheels = sorted(Path('dist').glob('jb_toc_frontend-*.whl'), key=lambda p: Version(p.name.split('-')[1]))\nassert wheels, 'no jb_toc_frontend wheel found in dist/'\nprint(wheels[-1])\nPY",
-  # Write a local-constraints file so pip knows to install jb_toc_frontend from the local wheel
-  "bash -lc 'FRONTEND_WHEEL=$(ls -1 dist/jb_toc_frontend-*.whl | tail -n1); echo \"jb_toc_frontend @ file://$PWD/$FRONTEND_WHEEL\" > .local-constraints.txt'",
-  # Install jb_toc_frontend from the local wheel, while still allowing it to search PyPi for dependencies
-  "python -m pip install -c .local-constraints.txt ."
+  # jb_toc_forntend is a dependency of jb_toc (with version parity), so we must install from local wheels 
+  "python scripts/install_local_wheels.py"
 ]
