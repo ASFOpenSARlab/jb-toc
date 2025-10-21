@@ -25,6 +25,7 @@ classifiers = [
 ]
 dependencies = [
     "jupyter-server>=2.0.0",
+    "jupyter-server-globbing",
     "jb_toc_frontend==0.0.0"
     ]
 description = "Server extension providing /jbtoc/titles for jb_toc_frontend, if Jupyter Server is available."

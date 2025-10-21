@@ -8,8 +8,7 @@ node_modules/
 .ipynb_checkpoints
 *.tsbuildinfo
 jb_toc/labextension
-# Version file is handled by hatchling
-jb_toc/_version.py
+jb_toc_frontend/labextension
 
 # Integration tests
 ui-tests/test-results/

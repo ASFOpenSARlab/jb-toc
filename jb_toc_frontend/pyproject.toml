@@ -1,5 +1,9 @@
 [build-system]
-requires = ["hatchling>=1.5.0", "jupyterlab>=4.0.0,<5"]
+requires = [
+    "hatchling>=1.5.0", 
+    "hatch-jupyter-builder>=0.5",
+    "jupyterlab>=4.0.0,<5"
+    ]
 build-backend = "hatchling.build"
 
 [project]
@@ -24,9 +28,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
 ]
-dependencies = [
-    "jupyter-server-globbing"
-]
+dependencies = []
 
 description = "Frontend Jupyter Lab extension providing Jupyter Book Table of Contents in Jupyter Lab"
 keywords = ["jupyter", "jupyterlab", "toc", "jupyter_book"]
@@ -45,8 +47,14 @@ packages = ["jb_toc_frontend"]
 [tool.hatch.build.hooks.jupyter-builder]
 dependencies = ["hatch-jupyter-builder>=0.5"]
 build-function = "hatch_jupyter_builder.npm_builder"
-ensured-targets = ["labextension/package.json"]
-skip-if-exists   = ["labextension/package.json"]
+ensured-targets = [
+    "labextension/package.json",
+    "labextension/static/remoteEntry.*.js"
+    ]
+skip-if-exists   = [
+    "labextension/package.json",
+    "labextension/static/remoteEntry.*.js"
+    ]
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
 path = "."
