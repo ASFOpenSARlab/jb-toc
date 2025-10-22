@@ -9,6 +9,7 @@ node_modules/
 *.tsbuildinfo
 jb_toc/labextension
 jb_toc_frontend/labextension
+package*.json
 
 # Integration tests
 ui-tests/test-results/

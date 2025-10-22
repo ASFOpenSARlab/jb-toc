@@ -5,30 +5,36 @@
 
 A JupyterLab extension that provides Jupyter Book navigation in a sidepanel widget with a Jupyter Book table of contents.
 
-This JupyterLab extension contains a frontend extension (`jb_toc_frontend`) as well as a server extension (`jb_toc`).
-
-`jb_toc_frontend` may be installed independently of the server extension when running Jupyter in a serverless environment such as JupyterLite. However, if your enviornemnt has a Jupyter server, it is recommended to install `jb_toc`, as it runs more quickly. For example, using `jb_toc_frontend` without the server extension on a JupyterHub may be quite slow due to file system latency and many GET requests. Note that `jb_toc` includes `jb_toc_frontend` as a dependency, so installing `jb_toc` intentionally installs both `jb_toc` and `jb_toc_frontend`.
-
-TLDR: Install `jb_toc` whenever possible, and fall back to installing only `jb_toc_frontend` if no Jupyter server is available.
-
-https://github.com/ASFOpenSARlab/jb-toc/assets/37909088/3aa48f43-dfeb-466d-8f33-afc10f333f50
-
-NPM frontend extension: `jb-toc-frontend`
-
 ## Requirements
 
 - JupyterLab >= 4.0.0 < 5
 
-## Install
+## Installation Options
+This JupyterLab extension contains a frontend extension (`jb_toc_frontend`) as well as a server extension (`jb_toc`).
 
-To install both the server and frontend extensions, execute:
+### Option 1 (Recommended)
+**Install `jb_toc` (installs both the frontend and server extensions)**
+- **When:** Anytime you have a Jupyter Server, which is most of the time, and anytime you are running Jupyter Lab.
 
+- **Why:** When Jupyter Server is available, this is the reliably faster option for loading a Jupyter Book TOC.
+
+- **Note:** If accidentally installed in a serverless environmnent, the extension will default to frontend-only mode and still work.
+
+To install both `jb_toc` and `jb_frontend`, execute:
 ```bash
 python -m pip install jb_toc
 ```
 
-To install only the frontend extension, execute:
+### Option 2:
+**Install `jb_toc_frontend` (installs only the frontend extension)**
 
+- **When:** When using JupyterLite. In a lightweight serverless environment where you want to avoid unessecarily installing the server extension.
+
+- **Why:** If Jupyter Server is not available, `jb_toc_frontend` can still access the files it needs to build the TOC (but more slowly). 
+
+- **Don't:** Have a frontend-only installation on a JupyterHub. It will take >3 seconds to load a TOC, and the hub has a Jupyter Server, so you should install `jb_toc` for a faster experience.
+
+To install `jb_toc_frontend`, execute:
 ```bash
 python -m pip install jb_toc_frontend
 ```
@@ -45,7 +51,6 @@ To remove the `jb_toc_frontend` extension, execute:
 ```bash
 python -m pip uninstall jb_toc_frontend
 ```
-
 
 ## Contributing
 
@@ -84,12 +89,13 @@ jupyter lab build --minimize=False
 ### Development uninstall
 
 ```bash
-pip uninstall jb_toc
+python -m pip uninstall jb_toc
+python -m pip uninstall jb_toc_frontend
 ```
 
 In development mode, you will also need to remove the symlink created by `jupyter labextension develop`
 command. To find its location, you can run `jupyter labextension list` to figure out where the `labextensions`
-folder is located. Then you can remove the symlink named `jb-toc` within that folder.
+folder is located. Then you can remove the symlink named `jb-toc-frontend` within that folder.
 
 ### Testing the extension
 
@@ -100,8 +106,8 @@ This extension is using [Jest](https://jestjs.io/) for JavaScript code testing.
 To execute them, execute:
 
 ```sh
-jlpm
-jlpm test
+jlpm --cwd ./jb_toc_frontend
+jlpm --cwd ./jb_toc_frontend test
 ```
 
 #### Integration tests
