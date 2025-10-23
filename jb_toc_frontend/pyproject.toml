@@ -38,8 +38,8 @@ artifacts = ["jb_toc_frontend/labextension"]
 exclude = [".github", "binder"]
 
 [tool.hatch.build.targets.wheel.shared-data]
-"labextension" = "share/jupyter/labextensions/jb-toc-frontend"
 "install.json" = "share/jupyter/labextensions/jb-toc-frontend/install.json"
+"labextension" = "share/jupyter/labextensions/jb-toc-frontend"
 
 [tool.hatch.build.targets.wheel]
 packages = ["jb_toc_frontend"]
@@ -52,14 +52,14 @@ build-function = "hatch_jupyter_builder.npm_builder"
 path = "."
 build_cmd = "build:prod"
 npm = ["jlpm"]
-build_dir = "labextension"
+build_dir = "jb_toc_frontend/labextension"
 
 [tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
 path = "."
 build_cmd = "install:extension"
 npm = ["jlpm"]
 source_dir = "src"
-build_dir = "labextension"
+build_dir = "jb_toc_frontend/labextension"
 
 [tool.check-wheel-contents]
 ignore = ["W002"]
