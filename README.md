@@ -10,10 +10,13 @@ A JupyterLab extension that provides Jupyter Book navigation in a sidepanel widg
 - JupyterLab >= 4.0.0 < 5
 
 ## Installation Options
+
 This JupyterLab extension contains a frontend extension (`jb_toc_frontend`) as well as a server extension (`jb_toc`).
 
 ### Option 1 (Recommended)
+
 **Install `jb_toc` (installs both the frontend and server extensions)**
+
 - **When:** Anytime you have a Jupyter Server, which is most of the time, and anytime you are running Jupyter Lab.
 
 - **Why:** When Jupyter Server is available, this is the reliably faster option for loading a Jupyter Book TOC.
@@ -21,20 +24,23 @@ This JupyterLab extension contains a frontend extension (`jb_toc_frontend`) as w
 - **Note:** If accidentally installed in a serverless environmnent, the extension will default to frontend-only mode and still work.
 
 To install both `jb_toc` and `jb_frontend`, execute:
+
 ```bash
 python -m pip install jb_toc
 ```
 
 ### Option 2:
+
 **Install `jb_toc_frontend` (installs only the frontend extension)**
 
 - **When:** When using JupyterLite. In a lightweight serverless environment where you want to avoid unessecarily installing the server extension.
 
-- **Why:** If Jupyter Server is not available, `jb_toc_frontend` can still access the files it needs to build the TOC (but more slowly). 
+- **Why:** If Jupyter Server is not available, `jb_toc_frontend` can still access the files it needs to build the TOC (but more slowly).
 
 - **Don't:** Have a frontend-only installation on a JupyterHub. It will take >3 seconds to load a TOC, and the hub has a Jupyter Server, so you should install `jb_toc` for a faster experience.
 
 To install `jb_toc_frontend`, execute:
+
 ```bash
 python -m pip install jb_toc_frontend
 ```
@@ -46,6 +52,7 @@ To remove the `jb_toc` extension, execute:
 ```bash
 python -m pip uninstall jb_toc
 ```
+
 To remove the `jb_toc_frontend` extension, execute:
 
 ```bash
@@ -66,7 +73,7 @@ Note: You will need NodeJS to build the extension package.
 python -m pip install -e ./jb_toc_frontend
 python -m pip install -e ./jb_toc
 # Link your development version of the extension with JupyterLab
-jupyter labextension develop --overwrite                    
+jupyter labextension develop --overwrite
 # Rebuild `jb_toc_frontend` Typescript source after making changes
 jlpm --cwd ./jb_toc_frontend build
 ```

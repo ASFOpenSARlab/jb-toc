@@ -7,9 +7,11 @@ A JupyterLab frontend extension that provides Jupyter Book navigation in a sidep
 - JupyterLab >= 4.0.0 < 5
 
 ## Install
-*Note: If you have a Jupyter server, for a performance boost, you should [install the server extension](../jb_toc/README.md), which automatically installs the frontend extension as well.*
+
+_Note: If you have a Jupyter server, for a performance boost, you should [install the server extension](../jb_toc/README.md), which automatically installs the frontend extension as well._
 
 To install `jb_toc_frontend`, execute:
+
 ```bash
 python -m pip install jb_toc_frontend
 ```

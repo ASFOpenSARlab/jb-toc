@@ -7,9 +7,11 @@ A JupyterLab extension that provides Jupyter Book navigation in a sidepanel widg
 - JupyterLab >= 4.0.0 < 5
 
 ## Install
+
 This installs both the `jb_toc` server extension and the `jb_toc_frontend` extension. If you are using JupyterLite and don't need a server extension, you can [install `jb_toc_frontend`](../jb_toc_frontend/README.md) without `jb_toc`.
 
 To install `jb_toc`, execute:
+
 ```bash
 python -m pip install jb_toc
 ```
