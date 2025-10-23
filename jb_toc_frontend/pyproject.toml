@@ -54,13 +54,14 @@ skip-if-exists   = ["jb_toc_frontend/labextension/package.json"]
 path = "."
 build_cmd = "build:prod"
 npm = ["jlpm"]
+build_dir = "jb_toc_frontend/jb_toc_frontend"
 
 [tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
 path = "."
 build_cmd = "install:extension"
 npm = ["jlpm"]
 source_dir = "src"
-build_dir = "labextension"
+build_dir = "jb_toc_frontend/jb_toc_frontend"
 
 [tool.check-wheel-contents]
 ignore = ["W002"]
