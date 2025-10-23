@@ -199,42 +199,6 @@ export async function globFiles(pattern: string): Promise<string[]> {
   return result;
 }
 
-let prettierModPromise:
-  | Promise<typeof import('prettier/standalone')>
-  | undefined;
-let htmlPluginPromise: Promise<any> | undefined;
-
-export async function formatHtmlForDev(html: string): Promise<string> {
-  if (process.env.NODE_ENV !== 'development') {
-    return html;
-  }
-
-  prettierModPromise ??= import('prettier/standalone').catch(err => {
-    prettierModPromise = undefined;
-    throw err;
-  });
-
-  htmlPluginPromise ??= import('prettier/plugins/html')
-    .then(m => (m as any).default ?? m)
-    .catch(err => {
-      htmlPluginPromise = undefined;
-      throw err;
-    });
-
-  const [prettierMod, htmlPlugin] = await Promise.all([
-    prettierModPromise,
-    htmlPluginPromise
-  ]);
-
-  const prettier: any = (prettierMod as any).default ?? prettierMod;
-  const parserHtml = (htmlPlugin as any).default ?? htmlPlugin;
-
-  return await prettier.format(html, {
-    parser: 'html',
-    plugins: [parserHtml]
-  });
-}
-
 function replaceAll(haystack: string, needle: string, replacement: string) {
   return haystack.split(needle).join(replacement);
 }
@@ -402,7 +366,6 @@ export async function getTOC(cwd: string): Promise<string> {
   }
 
   if (typeof html === 'string') {
-    html = await formatHtmlForDev(html); // no-op in prod
     console.debug(html);
     return html;
   } else {
