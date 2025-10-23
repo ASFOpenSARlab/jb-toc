@@ -47,6 +47,8 @@ packages = ["jb_toc_frontend"]
 [tool.hatch.build.hooks.jupyter-builder]
 dependencies = ["hatch-jupyter-builder>=0.5"]
 build-function = "hatch_jupyter_builder.npm_builder"
+ensured-targets = ["jb_toc_frontend/labextension/package.json"]
+skip-if-exists   = ["jb_toc_frontend/labextension/package.json"]
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
 path = "."
