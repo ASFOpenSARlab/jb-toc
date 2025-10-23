@@ -1,6 +1,6 @@
 {
     "name": "jb-toc-frontend",
-    "version": "1.0.5-dev0",
+    "version": "2.0.0",
     "description": "A JupyterLab extension that mimics jupyter-book chapter navigation on an un-built, cloned jupyter book in JupyterLab.",
     "keywords": [
         "jupyter",
@@ -96,8 +96,9 @@
         "access": "public"
     },
     "jupyterlab": {
-        "extension": true,
-        "outputDir": "jb_toc_frontend/labextension"
+        "extension": "lib/index.js",
+        "outputDir": "jb_toc_frontend/labextension",
+        "schemaDir": "schema" 
     },
     "eslintIgnore": [
         "node_modules",

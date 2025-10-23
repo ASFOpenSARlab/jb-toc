@@ -1,7 +1,7 @@
 [build-system]
 requires = [
     "hatchling>=1.5.0", 
-    "hatch-jupyter-builder>=0.5",
+    "hatch-jupyter-builder>=0.8.3",
     "jupyterlab>=4.0.0,<5"
     ]
 build-backend = "hatchling.build"
@@ -45,10 +45,9 @@ exclude = [".github", "binder"]
 packages = ["jb_toc_frontend"]
 
 [tool.hatch.build.hooks.jupyter-builder]
-dependencies = ["hatch-jupyter-builder>=0.5"]
-build-function = "hatch_jupyter_builder.npm_builder"
+dependencies = ["hatch-jupyter-builder>=0.8.3"]
+build-function = "jupyterlab.build:build_api"
 ensured-targets = ["jb_toc_frontend/labextension/package.json"]
-skip-if-exists   = ["jb_toc_frontend/labextension/package.json"]
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
 path = "."
