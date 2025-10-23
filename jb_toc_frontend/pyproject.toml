@@ -1,7 +1,7 @@
 [build-system]
 requires = [
     "hatchling>=1.5.0", 
-    "hatch-jupyter-builder>=0.8.3",
+    "hatch-jupyter-builder>=0.5",
     "jupyterlab>=4.0.0,<5"
     ]
 build-backend = "hatchling.build"
@@ -45,22 +45,21 @@ exclude = [".github", "binder"]
 packages = ["jb_toc_frontend"]
 
 [tool.hatch.build.hooks.jupyter-builder]
-dependencies = ["hatch-jupyter-builder>=0.8.3"]
+dependencies = ["hatch-jupyter-builder>=0.5"]
 build-function = "hatch_jupyter_builder.npm_builder"
-ensured-targets = ["jb_toc_frontend/labextension/package.json"]
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
 path = "."
 build_cmd = "build:prod"
 npm = ["jlpm"]
-build_dir = "jb_toc_frontend"
+build_dir = "labextension"
 
 [tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
 path = "."
 build_cmd = "install:extension"
 npm = ["jlpm"]
 source_dir = "src"
-build_dir = "jb_toc_frontend"
+build_dir = "labextension"
 
 [tool.check-wheel-contents]
 ignore = ["W002"]

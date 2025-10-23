@@ -96,9 +96,8 @@
         "access": "public"
     },
     "jupyterlab": {
-        "extension": "lib/index.js",
-        "outputDir": "jb_toc_frontend/labextension",
-        "schemaDir": "schema" 
+        "extension": true,
+        "outputDir": "jb_toc_frontend/labextension"
     },
     "eslintIgnore": [
         "node_modules",
