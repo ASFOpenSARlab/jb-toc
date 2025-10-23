@@ -97,7 +97,7 @@
     },
     "jupyterlab": {
         "extension": true,
-        "outputDir": "labextension"
+        "outputDir": "jb_toc_frontend/labextension"
     },
     "eslintIgnore": [
         "node_modules",

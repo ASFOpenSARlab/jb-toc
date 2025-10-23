@@ -8,7 +8,7 @@ node_modules/
 .ipynb_checkpoints
 *.tsbuildinfo
 jb_toc/labextension
-jb_toc_frontend/labextension
+jb_toc_frontend/jb_toc_frontend/labextension
 package*.json
 
 # Integration tests

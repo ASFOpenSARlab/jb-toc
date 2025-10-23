@@ -26,6 +26,17 @@ def npm_to_pep440(v: str) -> str:
     num = parts[1] if len(parts) > 1 and parts[1].isdigit() else '0'
     map_ = {'alpha': 'a', 'a': 'a', 'beta': 'b', 'b': 'b', 'rc': 'rc', 'dev': 'dev'}
     return f"{base}.{map_[tag]}{num}" if tag in map_ else f"{base}.dev0"
+    
+def get_pyproject_version(pyproj_text: str) -> str:
+    m = PROJECT_TABLE_RE.search(pyproj_text)
+    if not m:
+        raise ValueError("No [project] section found in pyproject.toml")
+    body = m.group('body')
+    m2 = VERSION_LINE_RE.search(body)
+    if not m2:
+        raise ValueError("No static version found in [project] (maybe dynamic= ['version']?)")
+
+    return m2.group('ver')
 
 def ensure_project_version(pyproj_text: str, pep440_version: str) -> str:
     """
@@ -89,15 +100,15 @@ def update_pyproj_dep(pyproj_path: Path, pep440_version: str) -> bool:
 
 def main():
     root = Path(__file__).resolve().parents[1]
-    pkg_json = root / "jb_toc_frontend/package.json"
+    root_pyproject = root / "pyproject.toml"
     pyproject_paths = [
-        root / "pyproject.toml",
         root / "jb_toc_frontend/pyproject.toml",
         root / "jb_toc/pyproject.toml",
     ]
 
-    data = json.loads(pkg_json.read_text(encoding="utf-8"))
-    version = data.get("version")
+    data = root_pyproject.read_text(encoding="utf-8")
+    version = get_pyproject_version(data)
+ 
     if not SEMVER.match(version or ""):
         print("Error: not semver", file=sys.stderr)
         sys.exit(2)

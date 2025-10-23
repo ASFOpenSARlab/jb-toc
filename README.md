@@ -65,6 +65,8 @@ Note: You will need NodeJS to build the extension package.
 # Install `jb_toc_frontend` first, as it is a dependency of `jb_toc`
 python -m pip install -e ./jb_toc_frontend
 python -m pip install -e ./jb_toc
+# Link your development version of the extension with JupyterLab
+jupyter labextension develop --overwrite                    
 # Rebuild `jb_toc_frontend` Typescript source after making changes
 jlpm --cwd ./jb_toc_frontend build
 ```

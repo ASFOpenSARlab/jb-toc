@@ -1,6 +1,6 @@
 # Making new releases of jb_toc and jb_toc_frontend
 
-`jb_toc` and `jb_toc_frontend` will maintain version parity and always release simultaneously. When running release actions, versions are synced across both packages from a single source of truth (`jb_toc/package.json`)
+`jb_toc` and `jb_toc_frontend` will maintain version parity and always release simultaneously. When running release actions, versions are synced across both packages from a single source of truth (`jb-toc/package.json`)
 
 ## Automated releases with Jupyter Releaser
 
@@ -19,7 +19,7 @@ Check out the [workflow documentation](https://jupyter-releaser.readthedocs.io/e
 
 ### Manually Set the Version
 
-1) Update the version in `jb_toc/package.json`
+1) Update the version in `jb-toc/package.json`
 
 
 ### Run the Prep Release and Publish Release Workflows

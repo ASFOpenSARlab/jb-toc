@@ -8,7 +8,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "jb_toc_frontend"
-version = "0.0.0"
+version = "2.0.0"
 
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -47,8 +47,6 @@ packages = ["jb_toc_frontend"]
 [tool.hatch.build.hooks.jupyter-builder]
 dependencies = ["hatch-jupyter-builder>=0.5"]
 build-function = "hatch_jupyter_builder.npm_builder"
-ensured-targets = ["labextension/package.json"]
-skip-if-exists   = ["labextension/package.json"]
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
 path = "."
