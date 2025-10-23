@@ -46,7 +46,7 @@ packages = ["jb_toc_frontend"]
 
 [tool.hatch.build.hooks.jupyter-builder]
 dependencies = ["hatch-jupyter-builder>=0.8.3"]
-build-function = "jupyterlab.build:build_api"
+build-function = "jupyterlab.build.build_api"
 ensured-targets = ["jb_toc_frontend/labextension/package.json"]
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
