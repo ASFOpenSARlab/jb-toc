@@ -43,6 +43,17 @@ _("jupyter", "server", "extension", "list")
 # initially list installed extensions to determine if there are any surprises
 _("jupyter", "labextension", "list")
 
+# clone in example v1 and v2 Jupyter Books
+subprocess.run([
+    "git", "clone", "--depth", "1",
+    "https://github.com/ASFOpenSARlab/opensarlab_MintPy_Recipe_Book.git"
+], check=True)
+
+subprocess.run([
+    "git", "clone", "--depth", "1",
+    "https://github.com/ASFOpenSARlab/opensarlab-docs.git",
+    "V2_Jupyter_Book"
+], check=True)
 
 print("JupyterLab with jb_toc is ready to run with:\n")
 print("\tjupyter lab\n")
