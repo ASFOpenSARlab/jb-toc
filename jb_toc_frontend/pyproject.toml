@@ -40,6 +40,9 @@ source = "nodejs"
 artifacts = ["jb_toc_frontend/labextension"]
 exclude = [".github", "binder"]
 
+[tool.hatch.build.targets.wheel]
+exclude = ["jb_toc_frontend/labextension/**"]
+
 [tool.hatch.build.targets.wheel.shared-data]
 "jb_toc_frontend/labextension" = "share/jupyter/labextensions/jb-toc-frontend"
 "jb_toc_frontend/labextension/package.json" = "share/jupyter/labextensions/jb-toc-frontend/package.json"
