@@ -31,7 +31,7 @@ def _(*args, **kwargs):
 _(sys.executable, "-m", "pip", "check")
 
 # install the labextension
-_(sys.executable, "-m", "pip", "install", "-e", f"./{JB_TOC}")
+_(sys.executable, "-m", "pip", "install", "-e", {JB_TOC})
 _(sys.executable, "-m", "jupyter", "labextension", "develop", "--overwrite", ".")
 
 # verify the environment the extension didn't break anything
