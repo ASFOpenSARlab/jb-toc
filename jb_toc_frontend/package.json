@@ -96,6 +96,16 @@
         "access": "public"
     },
     "jupyterlab": {
+        "discovery": {
+            "server": {
+                "managers": [
+                    "pip"
+                ],
+                "base": {
+                    "name": "jb_toc_frontend"
+                }
+            }
+        },
         "extension": true,
         "outputDir": "jb_toc_frontend/labextension"
     },
