@@ -360,7 +360,7 @@ export async function getTOC(cwd: string): Promise<string> {
     html = `
       <p id="toc-title">Not a Jupyter-Book</p>
       <p id="toc-author">Could not find a "_toc.yml", "_config.yml", or "myst.yml in or above the current directory:</p>
-      <p id="toc-author">${cwd}</p>
+      <p id="toc-author">${escHtml(cwd)}</p>
       <p id="toc-author">Please navigate to a Jupyter-Book directory to view its Table of Contents</p>
       `;
   }
