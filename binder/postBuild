@@ -48,7 +48,8 @@ _("jupyter", "labextension", "list")
 # clone in example v1 and v2 Jupyter Books
 subprocess.run([
     "git", "clone", "--depth", "1",
-    "https://github.com/ASFOpenSARlab/opensarlab_MintPy_Recipe_Book.git"
+    "https://github.com/ASFOpenSARlab/opensarlab_MintPy_Recipe_Book.git",
+    "V1_Jupyter_Book"
 ], check=True)
 
 subprocess.run([
