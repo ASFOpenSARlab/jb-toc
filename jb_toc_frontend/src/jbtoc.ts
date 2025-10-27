@@ -24,12 +24,14 @@ interface Cell {
 
 export type TOCHTML = { html: string; paths: string[] };
 
-export async function getFileContents(path: string): Promise<string> {
+export async function getFileContents(
+  path: string
+): Promise<Notebook | string> {
   try {
     const app = getJupyterAppInstance();
     const data = await app.serviceManager.contents.get(path, { content: true });
     if (data.type === 'notebook' || data.type === 'file') {
-      return data.content as string;
+      return data.content;
     } else {
       throw new Error(`Unsupported file type: ${data.type}`);
     }
@@ -128,31 +130,30 @@ function isNotebook(obj: any): obj is Notebook {
   return obj && typeof obj === 'object' && Array.isArray(obj.cells);
 }
 
+function normalizeSource(src: string | string[]): string {
+  return Array.isArray(src) ? src.join('') : src;
+}
+
 export async function getFileTitleFromHeader(
   filePath: string
 ): Promise<string | null> {
+  const atx = /^(#{1,6})\s+(.+?)\s*#*\s*$/;
   const suffix = extname(filePath);
   if (suffix === '.ipynb') {
     try {
       const jsonData: Notebook | string = await getFileContents(filePath);
       if (isNotebook(jsonData)) {
-        const headerCells = jsonData.cells.filter(cell => {
-          if (cell.cell_type === 'markdown') {
-            const source = Array.isArray(cell.source)
-              ? cell.source.join('')
-              : cell.source;
-            return source.split('\n').some(line => line.startsWith('# '));
+        // Scan markdown cells in order; return the first header line found
+        for (const cell of jsonData.cells) {
+          if (cell.cell_type !== 'markdown') {
+            continue;
           }
-          return false;
-        });
-
-        const firstHeaderCell = headerCells.length > 0 ? headerCells[0] : null;
-        if (firstHeaderCell) {
-          if (firstHeaderCell.source.split('\n')[0].slice(0, 2) === '# ') {
-            const title: string = firstHeaderCell.source
-              .split('\n')[0]
-              .slice(2);
-            return title;
+          const src = normalizeSource(cell.source);
+          for (const line of src.split('\n')) {
+            const m = line.match(atx);
+            if (m) {
+              return m[2];
+            }
           }
         }
       }
@@ -163,10 +164,10 @@ export async function getFileTitleFromHeader(
     try {
       const md: Notebook | string = await getFileContents(filePath);
       if (!isNotebook(md)) {
-        const lines: string[] = md.split('\n');
-        for (const line of lines) {
-          if (line.slice(0, 2) === '# ') {
-            return line.slice(2);
+        for (const line of (md as string).split('\n')) {
+          const m = line.match(atx);
+          if (m) {
+            return m[2];
           }
         }
       }
