@@ -5,7 +5,7 @@ import { test, expect, jest } from '@jest/globals';
 import * as fs from 'fs';
 import * as path from 'path';
 const jbtoc = require('../jbtoc');
-import { getJupyterAppInstance } from '../index';   
+import { getJupyterAppInstance } from '../index';
 
 const HEADER1_NB = path.resolve(__dirname, './fixtures/content/header1.ipynb');
 // const HEADER2_NB = path.resolve(__dirname, './fixtures/content/header2.ipynb');
@@ -26,7 +26,8 @@ type ContentsGet = (path: string, opts: any) => Promise<ContentsModel>;
 
 // Test HTML escaping
 const testString = `<div class="test" onclick="alert('xss')">Hello & 'world' © 💥 😈 <!--comment--></div>`;
-const escHtmlTestString = "&lt;div class=\"test\" onclick=\"alert('xss')\"&gt;Hello &amp; 'world' © 💥 😈 &lt;!--comment--&gt;&lt;/div&gt;"
+const escHtmlTestString =
+  '&lt;div class="test" onclick="alert(\'xss\')"&gt;Hello &amp; \'world\' © 💥 😈 &lt;!--comment--&gt;&lt;/div&gt;';
 test('HTML escaping with jbtoc.escHtml', () => {
   expect(jbtoc.escHtml(testString)).toBe(escHtmlTestString);
 });
@@ -87,8 +88,9 @@ test('jbtoc.getFileContents on unsupported file type', async () => {
     serviceManager: { contents: { get } }
   });
 
-  await expect(jbtoc.getFileContents(TXT))
-    .rejects.toThrow(/Unsupported file type: something_unexpected/);
+  await expect(jbtoc.getFileContents(TXT)).rejects.toThrow(
+    /Unsupported file type: something_unexpected/
+  );
 });
 
 test('jbtoc.getFileContents on bad path', async () => {
@@ -101,8 +103,9 @@ test('jbtoc.getFileContents on bad path', async () => {
 
   const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
-  await expect(jbtoc.getFileContents('bad/path.ipynb'))
-    .rejects.toThrow('404 Not Found');
+  await expect(jbtoc.getFileContents('bad/path.ipynb')).rejects.toThrow(
+    '404 Not Found'
+  );
 
   expect(consoleSpy).toHaveBeenCalledWith(
     expect.stringContaining('Failed to get file contents for bad/path.ipynb:'),
@@ -114,11 +117,19 @@ test('jbtoc.getFileContents on bad path', async () => {
 
 // Test jbtoc.htmlTok and jbtoc.attrToc
 test('jbtoc.htmlTok', () => {
-  expect(jbtoc.htmlTok(HEADER1_NB)).toBe(`[[TITLE_HTML::${encodeURIComponent(HEADER1_NB)}]]`);
+  expect(jbtoc.htmlTok(HEADER1_NB)).toBe(
+    `[[TITLE_HTML::${encodeURIComponent(HEADER1_NB)}]]`
+  );
 });
 
 test('jbtoc.attrTok', () => {
-  expect(jbtoc.attrTok(HEADER1_NB)).toBe(`[[TITLE_ATTR::${encodeURIComponent(HEADER1_NB)}]]`);
+  expect(jbtoc.attrTok(HEADER1_NB)).toBe(
+    `[[TITLE_ATTR::${encodeURIComponent(HEADER1_NB)}]]`
+  );
 });
 
-
+// jbtoc.normalize
+// test('jbtoc.normalize', () => {
+//   const result = jbtoc.normalize('./fixtures/content/my_dir');
+//   expect(result.toBe(`[[TITLE_HTML::${encodeURIComponent(HEADER1_NB)}]]`));
+// });

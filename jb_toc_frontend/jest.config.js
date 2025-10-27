@@ -6,7 +6,7 @@ const esModules = [
   '@jupyter/',
   '@jupyterlab/',
   '@lumino/',
-  '@microsoft/fast-', 
+  '@microsoft/fast-',
   'exenv-es6',
   'lib0',
   'nanoid',
