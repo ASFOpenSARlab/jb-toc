@@ -1,5 +1,7 @@
 import { ServerConnection } from '@jupyterlab/services';
+import type { Contents } from '@jupyterlab/services';
 import { URLExt } from '@jupyterlab/coreutils';
+import picomatch from 'picomatch';
 
 import * as yaml from 'js-yaml';
 import { getJupyterAppInstance } from './index';
@@ -112,7 +114,7 @@ async function findConfigInParents(cwd: string): Promise<string | null> {
 }
 
 export function normalize(p: string): string {
-  return p.replace(/\\/g, '/').replace(/\/{2,}/g, '/');
+  return p.replace(/\\/g, '/').replace(/\/+/g, '/');
 }
 
 export function extname(p: string): string {
@@ -178,26 +180,87 @@ export async function getFileTitleFromHeader(
   return null;
 }
 
-export async function globFiles(pattern: string): Promise<string[]> {
-  const baseDir = '';
-  const result: string[] = [];
+type Pattern = string;
 
-  try {
-    const app = getJupyterAppInstance();
-    const data = await app.serviceManager.contents.get(baseDir, {
-      content: true
-    });
-    const regex = new RegExp(pattern);
-    for (const item of data.content) {
-      if (item.type === 'file' && regex.test(item.path)) {
-        result.push(item.path);
+function isSimpleBasenameGlob(s: string): boolean {
+  // allow * ? [] {} etc., but not ** or any path separator
+  return !s.includes('**') && !/[\\/]/.test(s);
+}
+
+const GLOB_CHARS = /[*?[\]{}()!+@]/;
+
+export async function globFiles(pattern: Pattern): Promise<string[]> {
+  const { serviceManager } = getJupyterAppInstance();
+  const contents = serviceManager.contents;
+
+  // if no glob chars, fetch directly
+  if (!GLOB_CHARS.test(pattern)) {
+    try {
+      const model = await contents.get(pattern, { content: false });
+      if (model.type === 'file') {
+        return [normalize(model.path)];
       }
+    } catch {
+      return [];
     }
-  } catch (error) {
-    console.error(`Error globbing pattern ${pattern}`, error);
   }
 
-  return result;
+  const scan = picomatch.scan(pattern);
+  const start = normalize(scan.base ?? '');
+  const shallow = isSimpleBasenameGlob(pattern);
+
+  const isMatch = picomatch(pattern, { basename: shallow });
+
+  const out: string[] = [];
+
+  // Shallow search
+  async function listOnce(dir: string): Promise<void> {
+    const model = await contents.get(dir || '', { content: true });
+    if (model.type !== 'directory' || !Array.isArray(model.content)) {
+      return;
+    }
+
+    for (const entry of model.content as Contents.IModel[]) {
+      if (entry.type !== 'file') {
+        continue;
+      }
+      const name = entry.name ?? entry.path.split('/').pop() ?? '';
+      if (isMatch(name)) {
+        out.push(normalize(entry.path));
+      }
+    }
+  }
+
+  // Recursive search
+  async function walk(path: string): Promise<void> {
+    const model = await contents.get(path || '', { content: true });
+
+    if (model.type === 'directory' && Array.isArray(model.content)) {
+      for (const entry of model.content as Contents.IModel[]) {
+        if (entry.type === 'directory') {
+          await walk(entry.path);
+        } else if (entry.type === 'file') {
+          const p = normalize(entry.path);
+          if (isMatch(p)) {
+            out.push(p);
+          }
+        }
+      }
+    } else if (model.type === 'file') {
+      const p = normalize(model.path);
+      if (isMatch(p)) {
+        out.push(p);
+      }
+    }
+  }
+
+  if (shallow) {
+    await listOnce(start);
+  } else {
+    await walk(start || '');
+  }
+
+  return out;
 }
 
 function replaceAll(haystack: string, needle: string, replacement: string) {
