@@ -8,6 +8,22 @@ import { getJupyterAppInstance } from './index';
 
 import * as jb1 from './jb1';
 import * as jb2 from './jb2';
+import type { JBook1TOC } from './jb1';
+import type { MystProject } from './jb2';
+import type { Myst } from './jb2';
+
+// This dependency bag makes non-exported functions mockable for unit tests
+export const deps = {
+  findConfigInParents,
+  getFileContents,
+  applyTitles,
+  fetchTitlesBackend,
+  fetchTitlesFrontend,
+  yamlLoad: yaml.load,
+  ls,
+  jb1,
+  jb2
+};
 
 interface FileMetadata {
   path: string;
@@ -272,7 +288,7 @@ function stem(path: string) {
   return base.replace(/\.[^.]+$/, '');
 }
 
-export async function fetchTitlesBackend(
+async function fetchTitlesBackend(
   paths: string[]
 ): Promise<Record<string, { title: string; last_modified?: string }>> {
   const settings = ServerConnection.makeSettings();
@@ -334,7 +350,7 @@ function applyTitles(
 }
 
 export async function getTOC(cwd: string): Promise<string> {
-  const tocPath = await findConfigInParents(cwd);
+  const tocPath = await deps.findConfigInParents(cwd);
   let configPath = null;
   let configParent = null;
   let html: string | undefined | Error | any;
@@ -346,7 +362,7 @@ export async function getTOC(cwd: string): Promise<string> {
     configParent = parts.join('/');
 
     if (!myst) {
-      const files = await ls(configParent);
+      const files = await deps.ls(configParent);
       const configPattern = '_config.yml';
       for (const value of Object.values(files.content)) {
         const file = value as FileMetadata;
@@ -364,12 +380,27 @@ export async function getTOC(cwd: string): Promise<string> {
       configPath
     ) {
       try {
-        const tocYamlStr = await getFileContents(tocPath);
+        const tocYamlStr = await deps.getFileContents(tocPath);
         if (typeof tocYamlStr === 'string') {
-          const tocYaml: unknown = yaml.load(tocYamlStr);
-          const toc = tocYaml as jb1.JBook1TOC;
-          const config = await jb1.getJBook1Config(configPath);
-          const toc_html = await jb1.jBook1TOCToHtml(toc, configParent);
+          const tocYaml: unknown = deps.yamlLoad(tocYamlStr);
+          const toc = tocYaml as JBook1TOC;
+          const config = await deps.jb1.getJBook1Config(configPath);
+
+          const { html: tocHtmlRaw, paths } = await deps.jb1.jBook1TOCToHtml(
+            toc,
+            configParent
+          );
+          let map: Record<string, { title: string; last_modified?: string }>;
+          try {
+            map = await deps.fetchTitlesBackend(paths);
+          } catch {
+            map = await deps.fetchTitlesFrontend(paths);
+          }
+          const toc_html = deps.applyTitles(tocHtmlRaw, map);
+
+          console.log(paths);
+          console.log(tocHtmlRaw);
+
           html = `
           <div class="jbook-toc" data-toc-dir="${configParent}">
             <p id="toc-title">${escHtml(String(config.title))}</p>
@@ -387,25 +418,25 @@ export async function getTOC(cwd: string): Promise<string> {
       try {
         const mystYAMLStr = await getFileContents(tocPath);
         if (typeof mystYAMLStr === 'string') {
-          const mystYaml: unknown = yaml.load(mystYAMLStr);
-          const yml = mystYaml as jb2.Myst;
-          const project = yml.project as jb2.MystProject;
+          const mystYaml: unknown = deps.yamlLoad(mystYAMLStr);
+          const yml = mystYaml as Myst;
+          const project = yml.project as MystProject;
 
-          const html_top = await jb2.getHtmlTop(project, configParent);
+          const html_top = await deps.jb2.getHtmlTop(project, configParent);
 
-          const { html: tocHtmlRaw, paths } = await jb2.mystTOCToHtml(
+          const { html: tocHtmlRaw, paths } = await deps.jb2.mystTOCToHtml(
             project.toc,
             configParent
           );
           let map: Record<string, { title: string; last_modified?: string }>;
           try {
-            map = await fetchTitlesBackend(paths);
+            map = await deps.fetchTitlesBackend(paths);
           } catch {
-            map = await fetchTitlesFrontend(paths);
+            map = await deps.fetchTitlesFrontend(paths);
           }
-          const toc_html = applyTitles(tocHtmlRaw, map);
+          const toc_html = deps.applyTitles(tocHtmlRaw, map);
 
-          const html_bottom = await jb2.getHtmlBottom(project);
+          const html_bottom = await deps.jb2.getHtmlBottom(project);
 
           html = `
             ${html_top}
