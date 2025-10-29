@@ -453,7 +453,9 @@ test('getTOC: JB1 flow renders title, author, and TOC HTML, falls back to fronte
     paths: ['book/chap1.md', 'book/chap2.md']
   });
 
-  jest.spyOn(jbtoc.deps, 'fetchTitlesBackend').mockRejectedValue(new Error('down'));
+  jest
+    .spyOn(jbtoc.deps, 'fetchTitlesBackend')
+    .mockRejectedValue(new Error('down'));
   jest.spyOn(jbtoc.deps, 'fetchTitlesFrontend').mockResolvedValue({
     'book/chap1.md': { title: 'Chapter One' },
     'book/chap2.md': { title: 'Chapter Two' }
