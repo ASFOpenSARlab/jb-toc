@@ -145,8 +145,8 @@ test('jbtoc.normalize', () => {
   expect(result).toBe('C:/Users/Windows_person/my_dir.notebook.ipynb');
 });
 
-test('jbtoc.extname', () => {
-  expect(jbtoc.extname(HEADER1_NB)).toBe('.ipynb');
+test('jbtoc.getFileSuffix', () => {
+  expect(jbtoc.getFileSuffix(HEADER1_NB)).toBe('.ipynb');
 });
 
 test('jbtoc.getFullPath', () => {

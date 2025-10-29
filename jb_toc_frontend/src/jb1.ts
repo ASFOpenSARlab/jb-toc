@@ -5,7 +5,6 @@ import * as jbtoc from './jbtoc';
 interface JBook1Config {
   title: string;
   author: string;
-  logo: string;
 }
 
 export interface JBook1TOC {
@@ -27,6 +26,11 @@ interface Part {
   chapters: Section[];
 }
 
+/**
+ * Checks if an object meets the criteria to be a JBook1Config object
+ * @param obj An object to check
+ * @returns true if object has a string author and title
+ */
 function isJBook1Config(obj: any): obj is JBook1Config {
   return (
     obj &&
@@ -36,6 +40,12 @@ function isJBook1Config(obj: any): obj is JBook1Config {
   );
 }
 
+/**
+ * Reads the title and author from a _config.yml and returns them in a dictionary.
+ * Supplies placeholders if a value is empty.
+ * @param configPath - String path to the _config.yml
+ * @returns a mapping of title and author to their values or placeholders
+ */
 export async function getJBook1Config(
   configPath: string
 ): Promise<{ title: string | null; author: string | null }> {
@@ -57,6 +67,18 @@ export async function getJBook1Config(
   return { title: null, author: null };
 }
 
+/**
+ * Creates the TOC chapter structure, adding placeholder titles and lists of paths
+ * for title retreival.
+ * @param parts - A Section object
+ * @param cwd - String path of the current working directory
+ * of the Jupyter FileBrowser
+ * @param level - The current level of indentation. This is
+ * incremented recursivly and should not be set explicitly when
+ * called by another client.
+ * @returns A TOCHTML object for a chapter subsection containing HTML with
+ * title placeholders and a list of paths, which will be used for looking up titles
+ */
 async function getSubSection(
   parts: Section[],
   cwd: string,
@@ -66,12 +88,16 @@ async function getSubSection(
     cwd = cwd + '/';
   }
 
+  /**
+   * Provide the TOC button for a file with a placeholder title
+   * @param file - String path to a file to insert
+   * @returns TOC button for a file with a placeholder title
+   */
   async function insertFile(file: string) {
-    const parts = file.split('/');
-    parts.pop();
-    const k_dir = parts.join('/');
-    const pth = await jbtoc.getFullPath(file, `${cwd}${k_dir}`);
-    pathsSet.add(String(pth));
+    const pth = jbtoc.concatPath(file, `${cwd}`);
+    if (typeof pth === 'string') {
+      pathsSet.add(jbtoc.normalize(pth));
+    }
     let tHTML;
     if (typeof pth === 'string') {
       tHTML = jbtoc.htmlTok(pth);
@@ -86,7 +112,7 @@ async function getSubSection(
       const parts = k.file.split('/');
       parts.pop();
       const k_dir = parts.join('/');
-      const pth = await jbtoc.getFullPath(k.file, `${cwd}${k_dir}`);
+      const pth = jbtoc.concatPath(k.file, `${cwd}${k_dir}`);
       let title;
       if (typeof pth === 'string') {
         title = await jbtoc.getFileTitleFromHeader(pth);
@@ -135,6 +161,17 @@ async function getSubSection(
   return { html: html_snippets.join(''), paths: Array.from(pathsSet) };
 }
 
+/**
+ * Provides a list of paths to files whose titles need to be
+ * retreived, and the HTML for the chapter structure of the
+ * TOC with placeholder titles. It does not add the Book
+ * title, authors, or other book metadata.
+ * @param toc - A JBook1TOC object
+ * @param cwd - String path of the current working directory
+ * of the Jupyter FileBrowser
+ * @returns A TOCHTML object containing TOC HTML with title placeholders
+ * and a list of paths, which will be used for looking up titles
+ */
 export async function jBook1TOCToHtml(
   toc: JBook1TOC,
   cwd: string

@@ -74,6 +74,10 @@ const plugin: JupyterFrontEndPlugin<void> = {
 
 export default plugin;
 
+/**
+ * Adds a click event listener to the .toc-chevron buttons, which
+ * are used to hide or display TOC subsections
+ */
 function addClickListenerToChevron() {
   const buttons = document.querySelectorAll('.toc-chevron');
   buttons.forEach(buttonElement => {
@@ -84,6 +88,10 @@ function addClickListenerToChevron() {
   });
 }
 
+/**
+ * Hides or displays a list of TOC subsection elements below a chevron button
+ * @param button - The chevron button
+ */
 function toggleList(button: HTMLButtonElement): void {
   const list = button.parentElement?.nextElementSibling as HTMLElement | null;
   if (!list) {
@@ -99,6 +107,11 @@ function toggleList(button: HTMLButtonElement): void {
     : '<i class="fa fa-chevron-down toc-chevron"></i>';
 }
 
+/**
+ * Adds a click event listener to .toc-button objects
+ * @param fileBrowser - The Jupyter Lab FileBrowser
+ * @param docManager - The Jupyter Lab IDocumentManager
+ */
 function addClickListenerToButtons(
   fileBrowser: FileBrowser | null,
   docManager: IDocumentManager

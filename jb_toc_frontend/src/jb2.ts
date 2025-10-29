@@ -26,13 +26,36 @@ export interface MystTOC {
   glob?: string;
 }
 
+/**
+ * Provides a list of paths to files whose titles need to be
+ * retreived, and the HTML for the chapter structure of the
+ * TOC with placeholder titles. It does not add the Book
+ * title, authors, or other book metadata.
+ * @param toc - a MystTOC object
+ * @param cwd - String path of the current working directory
+ * of the Jupyter FileBrowser
+ * @param level - The current level of indentation. This is
+ * incremented recursivly and should not be set explicitly when
+ * called by another client.
+ * @returns A TOCHTML object containing TOC HTML with title placeholders
+ * and a list of paths, which will be used for looking up titles
+ */
 export async function mystTOCToHtml(
   toc: MystTOC[],
   cwd: string,
   level: number = 1
 ): Promise<jbtoc.TOCHTML> {
+  /**
+   * Inserts a placeholder title to a file into the the TOC, and optionally
+   * adds a chevron button if the file is a chapter header
+   * @param file - String path to the file to be added to the TOC
+   * @param chevron - A boolean indicating if the file is also a
+   * chapter header and should have a chevron button
+   * @returns The div containing placeholder titles, optionally including
+   * a chevron button
+   */
   async function insertFile(file: string, chevron: boolean = false) {
-    const pth = await jbtoc.getFullPath(file, cwd);
+    const pth = jbtoc.concatPath(file, cwd);
     pathsSet.add(String(pth));
 
     const sectionId = `sec-${Math.random().toString(36).slice(2)}`;
@@ -71,7 +94,17 @@ export async function mystTOCToHtml(
     return file_html;
   }
 
-  async function insertMystTitle(htmlTitle: string, attrTitle: string) {
+  /**
+   * Inserts a title and chevron button when a title is provided
+   * for a chapter header
+   * @param htmlTitle - The escaped title for HTML text
+   * @param attrTitle - the escaped title for HTML attributes
+   * @returns The div containing title and its chevron button
+   */
+  async function insertMystTitle(
+    htmlTitle: string,
+    attrTitle: string
+  ): Promise<string> {
     const sectionId = `sec-${Math.random().toString(36).slice(2)}`;
 
     return `
@@ -92,6 +125,13 @@ export async function mystTOCToHtml(
     `;
   }
 
+  /**
+   * Inserts a URL link into the TOC
+   * @param htmlTitle - the HTML escaped title
+   * @param attrTitle - The HTML attribute escaped title
+   * @param url - The URL
+   * @returns A div containing the link button
+   */
   async function insertUrl(htmlTitle: string, attrTitle: string, url: string) {
     return `
     <div class="toc-row">
@@ -145,6 +185,13 @@ export async function mystTOCToHtml(
   return { html: html_snippets.join(''), paths: Array.from(pathsSet) };
 }
 
+/**
+ * Creates the start of the div containg the TOC.
+ * This includes the Jupyter Book title and subtitle.
+ * @param project - A MystProject object containing a myst toc and book metadata
+ * @param configParent - The path to the directory holding the Jupyter Book config
+ * @returns A div containing the Jupyter Book title and subtitle
+ */
 export async function getHtmlTop(
   project: MystProject,
   configParent: string
@@ -161,7 +208,19 @@ export async function getHtmlTop(
   return html_top;
 }
 
+/**
+ * Creates the div that appears below the TOC and includes available book metadata
+ * such as authors, copyright, DOI, GitHub URL, etc...
+ * @param project - A MystProject object containing a myst toc and book metadata
+ * @returns A div containing Jupyter Book Metadata
+ */
 export async function getHtmlBottom(project: MystProject): Promise<string> {
+  /**
+   * Creates a shield.io button that links to the doi.org site for a Jupyter
+   * Book's DOI
+   * @param doi - The doi # from the myst.yml doi entry
+   * @returns A shield button that links to a doi on doi.org
+   */
   function getDOIHtml(doi: string) {
     if (!doi) {
       return '';
@@ -192,7 +251,13 @@ export async function getHtmlBottom(project: MystProject): Promise<string> {
   </a>`;
   }
 
-  function getGithubHtml(github: string) {
+  /**
+   * Creates a github URL and provides a shield.io button with a link to it.
+   * Handles config entries with or without a full URL.
+   * @param github - The github entry in the myst.yml
+   * @returns a shield.io button with a link to the provided or constructed URL
+   */
+  function getGithubHtml(github: string): string {
     let githubUrl: string;
     let githubLabel: string;
 
