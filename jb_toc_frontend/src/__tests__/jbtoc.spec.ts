@@ -149,14 +149,14 @@ test('jbtoc.getFileSuffix', () => {
   expect(jbtoc.getFileSuffix(HEADER1_NB)).toBe('.ipynb');
 });
 
-test('jbtoc.getFullPath', () => {
-  expect(jbtoc.getFullPath('notebook.ipynb', 'my_book_root')).toBe(
+test('jbtoc.concatPath', () => {
+  expect(jbtoc.concatPath('notebook.ipynb', 'my_book_root')).toBe(
     'my_book_root/notebook.ipynb'
   );
 });
 
-test('jbtoc.getFullPath with /', () => {
-  expect(jbtoc.getFullPath('notebook.ipynb', 'my_book_root/')).toBe(
+test('jbtoc.concatPath with /', () => {
+  expect(jbtoc.concatPath('notebook.ipynb', 'my_book_root/')).toBe(
     'my_book_root/notebook.ipynb'
   );
 });
