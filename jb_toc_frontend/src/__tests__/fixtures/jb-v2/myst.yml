@@ -20,9 +20,12 @@ project:
         - file: ../content/header2.md
           children:
             - file: ../content/header2.ipynb
-              children: ../content/my_dir/header_placement.ipynb
+              children:
+                - file: ../content/my_dir/header_placement.ipynb
         - file: ../content/bad_path.ipynb
         - file: ../content/text.txt
+        - url: https://github.com/ASFOpenSARlab
+          title: My URL
     - title: Title 3
       children:
         - glob: ../content/*.md

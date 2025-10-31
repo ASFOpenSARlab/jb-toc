@@ -35,7 +35,6 @@ function dir(path: string, children: ContentsModel[]): ContentsModel {
   return { type: 'directory', path, name, content: children };
 }
 
-// Test HTML escaping
 const testString = `<div class="test" onclick="alert('xss')">Hello & 'world' © 💥 😈 <!--comment--></div>`;
 const escHtmlTestString =
   '&lt;div class="test" onclick="alert(\'xss\')"&gt;Hello &amp; \'world\' © 💥 😈 &lt;!--comment--&gt;&lt;/div&gt;';
@@ -48,7 +47,6 @@ test('HTML attribute escaping with jbtoc.escAttr', () => {
   expect(jbtoc.escAttr(testString)).toBe(escAttrTestString);
 });
 
-// Test jbtoc.getFileContents
 test('jbtoc.getFileContents on a notebook', async () => {
   const nbJSON = fs.readFileSync(HEADER1_NB, 'utf-8');
 
