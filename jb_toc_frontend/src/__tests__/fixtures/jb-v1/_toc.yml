@@ -1,0 +1,15 @@
+format: jb-book
+root: README
+parts:
+  - caption: Title 1
+    chapters:
+      - file: header1.md
+  - caption: Title 2
+    chapters:
+      - file: header1.ipynb
+      - file: header2.ipynb
+      - file: header2.md
+        sections:
+        - file: content/header_placement.ipynb
+        - url: https://search.asf.alaska.edu
+          title: ASF Vertex, Data Search

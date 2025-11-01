@@ -1,6 +1,8 @@
 {
   "extends": "./tsconfig",
   "compilerOptions": {
-    "types": ["jest"]
-  }
+    "types": ["jest", "node"],
+    "module": "commonjs"
+  },
+  "include": ["**/*.spec.ts", "**/*.test.ts"]
 }

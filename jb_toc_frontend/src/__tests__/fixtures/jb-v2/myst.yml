@@ -1,0 +1,31 @@
+version: 1
+project:
+  title: jb_toc Testing (v2)
+  subtitle: jb_toc test Jupyter Book 2
+  authors:
+    - name: The ASF Services Team
+    - name: John Doe
+    - name: 12345
+  github: https://github.com/ASFOpenSARlab/jb-toc
+  license: BSD-3
+  doi: 10.5281/zenodo.10093077
+  copyright: 2025 ASF
+  toc:
+    - file: ../content/header1.md
+    - title: Title 1
+      children:
+        - file: ../content/header1.ipynb
+    - title: Title 2
+      children:
+        - file: ../content/header2.md
+          children:
+            - file: ../content/header2.ipynb
+              children:
+                - file: ../content/my_dir/header_placement.ipynb
+        - file: ../content/bad_path.ipynb
+        - file: ../content/text.txt
+        - url: https://github.com/ASFOpenSARlab
+          title: My URL
+    - title: Title 3
+      children:
+        - glob: ../content/*.md
