@@ -4,7 +4,12 @@ build-backend = "hatchling.build"
 
 [project]
 name = "jb_toc_frontend"
+
+# Source of truth for both jb_toc and jb_toc_frontend packages: 
+# All pyproject.toml and package.json files will be synched to this version.
+# Set here prior to release.
 version = "2.0.0"
+
 [tool.jupyter-releaser.options]
 version_spec = "major"
 version_cmd  = 'bash -lc "python \"$(git rev-parse --show-toplevel)/scripts/sync_version.py\" --version $0"'
@@ -35,6 +40,8 @@ before-bump-version = [
   'bash -lc "python \"$(git rev-parse --show-toplevel)/scripts/sync_version.py\""'
 ]
 after-build-python = [
-  # jb_toc_frontend is a dependency of jb_toc (with version parity), so we must install from local wheels 
+  # jb_toc_frontend is a dependency of jb_toc (with version parity), so we install from 
+  # local wheels during GitHub Actions
+
   "python scripts/install_local_wheels.py"
 ]

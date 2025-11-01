@@ -75,7 +75,7 @@ def ensure_project_dep(pyproj_text: str, pep440_version: str) -> str:
     else:
         if body and not body.startswith("\n"):
             body = "\n" + body
-        body = f'\n"    jb_toc_frontend=={pep440_version}"{body}'
+        body = f'\n    "jb_toc_frontend=={pep440_version}"\n{body}'
 
     new_project_block = f"[project]\n{body}"
     return pyproj_text[:start] + new_project_block + pyproj_text[end:]
@@ -98,12 +98,34 @@ def update_pyproj_dep(pyproj_path: Path, pep440_version: str) -> bool:
         return True
     return False
 
+def update_package_json_version(pkg_path: Path, semver_version: str) -> bool:
+    if not pkg_path.exists():
+        return False
+    try:
+        data = json.loads(pkg_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid JSON in {pkg_path}: {e}") from e
+
+    old = data.get("version")
+    if old == semver_version:
+        return False
+
+    data["version"] = semver_version
+
+    # Write back with 2-space indent and trailing newline
+    pkg_path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return True
+
 def main():
     root = Path(__file__).resolve().parents[1]
     root_pyproject = root / "pyproject.toml"
     pyproject_paths = [
         root / "jb_toc_frontend/pyproject.toml",
         root / "jb_toc/pyproject.toml",
+    ]
+    package_json_paths = [
+        root / "jb_toc_frontend/package.json",
+        root / "jb_toc/package.json",
     ]
 
     data = root_pyproject.read_text(encoding="utf-8")
@@ -122,10 +144,14 @@ def main():
         if "jb_toc" in str(p) and "frontend" not in str(p):
             update_pyproj_dep(p, pep_version)
 
+    for p in package_json_paths:
+        if update_package_json_version(p, version):
+            updated.append(p)
+
     if len(updated) > 0:
         print(f"Wrote version {pep_version} to:")
         for p in updated:
-            print(f" - {p.relative_to(root)} (pyproject.toml)")
+            print(f" - {p.relative_to(root)}")
 
 if __name__ == "__main__":
     main()
