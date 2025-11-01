@@ -99,22 +99,18 @@ def update_pyproj_dep(pyproj_path: Path, pep440_version: str) -> bool:
     return False
 
 def update_package_json_version(pkg_path: Path, semver_version: str) -> bool:
-    if not pkg_path.exists():
-        return False
-    try:
-        data = json.loads(pkg_path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError as e:
-        raise ValueError(f"Invalid JSON in {pkg_path}: {e}") from e
+    text = pkg_path.read_text(encoding="utf-8")
+    new_text = re.sub(
+        r'("version"\s*:\s*")[^"]+(")',
+        rf'\g<1>{semver_version}\2',
+        text,
+        count=1,
+    )
+    if new_text != text:
+        pkg_path.write_text(new_text, encoding="utf-8")
+        return True
+    return False
 
-    old = data.get("version")
-    if old == semver_version:
-        return False
-
-    data["version"] = semver_version
-
-    # Write back with 2-space indent and trailing newline
-    pkg_path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    return True
 
 def main():
     root = Path(__file__).resolve().parents[1]
