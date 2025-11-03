@@ -19,8 +19,8 @@ jobs:
       - name: Base Setup
         uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
 
-      - name: Sync version mirrors
-        run: python scripts/sync_version.py
+      # - name: Sync version mirrors
+      #   run: python scripts/sync_version.py
 
       - name: Install jupyter-releaser
         run: python -m pip install jupyter-releaser
