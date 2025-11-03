@@ -2,15 +2,8 @@ name: "Step 1: Prep Release"
 on:
   workflow_dispatch:
     inputs:
-      version_spec:
-        description: "New Version Specifier"
-        default: "next"
-        required: false
       branch:
         description: "The branch to target"
-        required: false
-      post_version_spec:
-        description: "Post Version Specifier"
         required: false
       since:
         description: "Use PRs with activity since this date or git reference"
@@ -27,13 +20,14 @@ jobs:
     steps:
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
 
+      - name: Sync version mirrors
+        run: python scripts/sync_version.py
+
       - name: Prep Release
         id: prep-release
         uses: jupyter-server/jupyter_releaser/.github/actions/prep-release@v2
         with:
           token: ${{ secrets.PUBLISH_GITHUB_PAT }}
-          version_spec: ${{ github.event.inputs.version_spec }}
-          post_version_spec: ${{ github.event.inputs.post_version_spec }}
           branch: ${{ github.event.inputs.branch }}
           since: ${{ github.event.inputs.since }}
           since_last_stable: ${{ github.event.inputs.since_last_stable }}

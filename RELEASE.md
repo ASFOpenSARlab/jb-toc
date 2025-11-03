@@ -18,8 +18,9 @@ Check out the [workflow documentation](https://jupyter-releaser.readthedocs.io/e
 3. Ensure the publish release job as `permissions`: `id-token : write` (see the [documentation](https://docs.pypi.org/trusted-publishers/using-a-publisher/))
 
 ### Manually Set the Version
+All pyproject.toml and package.json versions are synced with `jb-toc/pyproject.toml` during release actions.
 
-1. Update the version in `jb-toc/package.json`
+1. Update the version in one place `jb-toc/pyproject.toml` 
 
 ### Run the Prep Release and Publish Release Workflows
 
