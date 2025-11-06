@@ -399,7 +399,7 @@ function getFilename(path: string) {
  */
 async function fetchTitlesBackend(
   paths: string[]
-): Promise<Record<string, { title: string }>> {
+): Promise<Record<string, string>> {
   const settings = ServerConnection.makeSettings();
   const url = URLExt.join(settings.baseUrl, 'jbtoc', 'titles');
   const resp = await ServerConnection.makeRequest(
@@ -417,14 +417,12 @@ async function fetchTitlesBackend(
   }
 
   const data = (await resp.json()) as {
-    titles: Record<string, { title?: string }>;
+    titles: Record<string, string>;
   };
 
-  const out: Record<string, { title: string }> = {};
+  const out: Record<string, string > = {};
   for (const [p, v] of Object.entries(data.titles)) {
-    if (v?.title) {
-      out[p] = { title: v.title };
-    }
+    out[p] = v;
   }
   return out;
 }
@@ -438,16 +436,16 @@ async function fetchTitlesBackend(
  * @returns a Record mapping each path to its title
  */
 async function fetchTitlesFrontend(paths: string[]) {
-  const out: Record<string, { title: string }> = {};
+  const out: Record<string, string > = {};
   for (const p of paths) {
     try {
       let t = await getFileTitleFromHeader(String(p));
       if (!t) {
         t = getFilename(p);
       }
-      out[p] = { title: String(t) };
+      out[p] = String(t);
     } catch {
-      out[p] = { title: getFilename(p) };
+      out[p] = getFilename(p);
     }
   }
   return out;
@@ -462,9 +460,9 @@ async function fetchTitlesFrontend(paths: string[]) {
  */
 function applyTitles(
   html: string,
-  titleMap: Record<string, { title: string }>
+  titleMap: Record<string, string>
 ) {
-  for (const [path, { title }] of Object.entries(titleMap)) {
+  for (const [path, title ] of Object.entries(titleMap)) {
     const safeHtml = escHtml(String(title));
     const safeAttr = escAttr(String(title));
     html = replaceAll(html, htmlTok(path), safeHtml);
@@ -521,7 +519,7 @@ export async function getTOC(cwd: string): Promise<string> {
             toc,
             configParent
           );
-          let map: Record<string, { title: string }>;
+          let map: Record<string, string>;
           try {
             map = await deps.fetchTitlesBackend(paths);
           } catch {
@@ -555,7 +553,7 @@ export async function getTOC(cwd: string): Promise<string> {
             project.toc,
             configParent
           );
-          let map: Record<string, { title: string }>;
+          let map: Record<string, string>;
           try {
             map = await deps.fetchTitlesBackend(paths);
           } catch {
