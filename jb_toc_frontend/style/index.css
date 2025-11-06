@@ -17,7 +17,7 @@
 }
 
 .jp-Button.toc-button.toc-link {
-  color: #1a73e8;
+  color: var(--jp-content-link-color);
 }
 
 .jp-Button.toc-chevron:hover {
