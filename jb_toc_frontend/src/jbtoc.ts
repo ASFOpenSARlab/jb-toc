@@ -420,7 +420,7 @@ async function fetchTitlesBackend(
     titles: Record<string, string>;
   };
 
-  const out: Record<string, string > = {};
+  const out: Record<string, string> = {};
   for (const [p, v] of Object.entries(data.titles)) {
     out[p] = v;
   }
@@ -436,7 +436,7 @@ async function fetchTitlesBackend(
  * @returns a Record mapping each path to its title
  */
 async function fetchTitlesFrontend(paths: string[]) {
-  const out: Record<string, string > = {};
+  const out: Record<string, string> = {};
   for (const p of paths) {
     try {
       let t = await getFileTitleFromHeader(String(p));
@@ -458,11 +458,8 @@ async function fetchTitlesFrontend(paths: string[]) {
  * @param titleMap - The Record mapping file paths to titles
  * @returns The TOC HTML in which placeholder titles have been replaced
  */
-function applyTitles(
-  html: string,
-  titleMap: Record<string, string>
-) {
-  for (const [path, title ] of Object.entries(titleMap)) {
+function applyTitles(html: string, titleMap: Record<string, string>) {
+  for (const [path, title] of Object.entries(titleMap)) {
     const safeHtml = escHtml(String(title));
     const safeAttr = escAttr(String(title));
     html = replaceAll(html, htmlTok(path), safeHtml);
