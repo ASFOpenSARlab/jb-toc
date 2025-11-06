@@ -11,7 +11,6 @@ name = "jb_toc_frontend"
 version = "2.0.0"
 
 [tool.jupyter-releaser.options]
-version_spec = "major"
 version_cmd  = 'bash -lc "python \"$(git rev-parse --show-toplevel)/scripts/sync_version.py\" --version $0"'
 npm_command = 'bash -lc "jlpm --cwd \"$(git rev-parse --show-toplevel)/jb_toc_frontend\" install --immutable && jlpm --cwd \"$(git rev-parse --show-toplevel)/jb_toc_frontend\" build:prod"'
 python_packages = ["jb_toc_frontend", "jb_toc"]
