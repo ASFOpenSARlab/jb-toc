@@ -71,7 +71,7 @@ def ensure_project_dep(pyproj_text: str, pep440_version: str) -> str:
     body = m.group('body')
 
     if FRONTEND_DEP_RE.search(body):
-        body = FRONTEND_DEP_RE.sub(f'    "jb_toc_frontend=={pep440_version}"', body, count=1)
+        body = FRONTEND_DEP_RE.sub(f'    "jb_toc_frontend=={pep440_version}",', body, count=1)
     else:
         if body and not body.startswith("\n"):
             body = "\n" + body
