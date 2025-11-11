@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" perform a development install of jupyterlab_jupyterbook_navigation
+""" perform a development install of jb_toc
 
     On Binder, this will run _after_ the environment has been fully created from
     the environment.yml in this directory.
@@ -14,6 +14,8 @@ from pathlib import Path
 
 
 ROOT = Path.cwd()
+JB_TOC_FRONTEND = ROOT / "jb_toc_frontend"
+JB_TOC   = ROOT / "jb_toc"
 
 def _(*args, **kwargs):
     """ Run a command, echoing the args
@@ -30,7 +32,8 @@ def _(*args, **kwargs):
 _(sys.executable, "-m", "pip", "check")
 
 # install the labextension
-_(sys.executable, "-m", "pip", "install", "-e", ".")
+_(sys.executable, "-m", "pip", "install", "-e", str(JB_TOC_FRONTEND))
+_(sys.executable, "-m", "pip", "install", "-e", str(JB_TOC))
 _(sys.executable, "-m", "jupyter", "labextension", "develop", "--overwrite", ".")
 
 # verify the environment the extension didn't break anything
@@ -42,6 +45,18 @@ _("jupyter", "server", "extension", "list")
 # initially list installed extensions to determine if there are any surprises
 _("jupyter", "labextension", "list")
 
+# clone in example v1 and v2 Jupyter Books
+subprocess.run([
+    "git", "clone", "--depth", "1",
+    "https://github.com/ASFOpenSARlab/opensarlab_MintPy_Recipe_Book.git",
+    "V1_Jupyter_Book"
+], check=True)
 
-print("JupyterLab with jupyterlab_jupyterbook_navigation is ready to run with:\n")
+subprocess.run([
+    "git", "clone", "--depth", "1",
+    "https://github.com/ASFOpenSARlab/opensarlab-docs.git",
+    "V2_Jupyter_Book"
+], check=True)
+
+print("JupyterLab with jb_toc is ready to run with:\n")
 print("\tjupyter lab\n")

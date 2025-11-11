@@ -1,20 +1,20 @@
-# a mybinder.org-ready environment for demoing jupyterlab_jupyterbook_navigation
+# a mybinder.org-ready environment for demoing jb_toc
 # this environment may also be used locally on Linux/MacOS/Windows, e.g.
 #
 #   conda env update --file binder/environment.yml
-#   conda activate jupyterlab-jupyterbook-navigation-demo
+#   conda activate jb-toc-demo
 #
-name: jupyterlab-jupyterbook-navigation-demo
+name: jb-toc-demo
 
 channels:
   - conda-forge
 
 dependencies:
   # runtime dependencies
-  - python >=3.10,<3.11.0a0
+  - python >=3.10,<3.13
   - jupyterlab >=4.0.0,<5
   # labextension build dependencies
-  - nodejs >=18,<19
+  - nodejs >=20
   - pip
   - wheel
   # additional packages for demos

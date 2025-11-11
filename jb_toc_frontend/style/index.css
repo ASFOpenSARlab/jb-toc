@@ -1,0 +1,119 @@
+@import url('base.css');
+
+.jp-Button.toc-button {
+  color: var(--jp-layout-color4);
+  background-color: var(--jp-layout-color1);
+  display: block;
+}
+
+.jp-Button.toc-button:hover {
+  color: var(--jp-layout-color3);
+}
+
+.jp-Button.toc-chevron {
+  color: var(--jp-layout-color4);
+  background-color: var(--jp-layout-color1);
+  padding-left: 6px;
+}
+
+.jp-Button.toc-button.toc-link {
+  color: var(--jp-content-link-color);
+}
+
+.jp-Button.toc-chevron:hover {
+  color: var(--jp-layout-color3);
+}
+
+.jp-GitHubLink {
+  display: flex;
+  align-items: center;
+  color: var(--jp-ui-font-color1);
+  text-decoration: none;
+  padding-left: 15px;
+}
+
+.jp-GitHubLink:hover {
+  color: var(--jp-content-link-color);
+}
+
+.tb-level1 {
+  padding-left: 12px;
+}
+
+.tb-level2 {
+  padding-left: 24px;
+}
+
+.tb-level3 {
+  padding-left: 36px;
+}
+
+.tb-level4 {
+  padding-left: 48px;
+}
+
+.jbook-icon {
+  background-image: url('jbook_icon.svg');
+}
+
+.jbook-icon svg path {
+  display: none;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  padding-left: 15px;
+}
+
+#toc-title {
+  font-size: var(--jp-ui-font-size2);
+  font-weight: bold;
+  color: var(--jp-jupyter-icon-color);
+  padding-left: 15px;
+}
+
+#toc-author {
+  font-size: var(--jp-ui-font-size1);
+  font-weight: bold;
+  color: var(--jp-ui-font-color2);
+  padding-left: 15px;
+}
+
+#toc-subtitle {
+  font-style: italic;
+  padding-left: 15px;
+}
+
+.toc-hr {
+  width: calc(100% - 30px);
+  margin: 0 auto;
+  border: none;
+  border-top: 2px solid var(--jp-layout-color3);
+}
+
+div.lm-Widget[id='@jupyterlab-sidepanel/jb-toc'] {
+  overflow-y: auto;
+}
+
+.toc-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.toc-children[hidden] {
+  display: none;
+}
+
+.toc-children {
+  display: block;
+}
+
+.caption {
+  margin: 0;
+}

@@ -1,0 +1,62 @@
+[build-system]
+requires = ["hatchling>=1.5.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jb_toc"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+
+# This version is synced with jb-toc/pyproject.toml during release.
+# Do not manually set.
+version = "0.0.0"
+
+classifiers = [
+    "Framework :: Jupyter",
+    "Framework :: Jupyter :: JupyterLab",
+    "Framework :: Jupyter :: JupyterLab :: 4",
+    "Framework :: Jupyter :: JupyterLab :: Extensions",
+    "Framework :: Jupyter :: JupyterLab :: Extensions :: Prebuilt",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "jupyter-server>=2.0.0",
+    "jupyter-server-globbing",
+    "jb_toc_frontend==0.0.0",
+    ]
+description = "Server extension providing /jbtoc/titles for jb_toc_frontend, if Jupyter Server is available."
+keywords = ["jupyter", "jupyterlab", "toc", "jupyter_book"]
+
+[project.optional-dependencies]
+test = [
+    "coverage",
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+    "pytest-jupyter[server]>=0.6.0"
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+addopts = "-ra -p pytest_jupyter.jupyter_server"
+testpaths = ["jb_toc/tests"]
+
+[project.entry-points."jupyter_server.extension"]
+jb_toc = "jb_toc"
+
+[tool.hatch.build.targets.wheel]
+packages = ["jb_toc"]
+exclude = ["jb_toc/jupyter-config/jupyter_server_config.d/jb_toc.json"]
+
+[tool.check-wheel-contents]
+ignore = ["W002"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"jb_toc/jupyter-config/jupyter_server_config.d/jb_toc.json" = "etc/jupyter/jupyter_server_config.d/jb_toc.json"

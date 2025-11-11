@@ -8,12 +8,12 @@ file_extension: ''
 has_binder: true
 has_settings: false
 kind: frontend
-labextension_name: jupyterlab-jupyterbook-navigation
+labextension_name: jb-toc
 mimetype: ''
 mimetype_name: ''
 project_short_description: "A JupyterLab extension that mimics jupyter-book chapter navigation on an un-built, cloned jupyter book in JupyterLab."
-python_name: jupyterlab_jupyterbook_navigation
-repository: https://github.com/ASFOpenSARlab/jupyterlab-jupyterbook-navigation
+python_name: jb_toc
+repository: https://github.com/ASFOpenSARlab/jb-toc
 test: true
 viewer_name: ''
 

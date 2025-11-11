@@ -1,78 +1,46 @@
 [build-system]
-requires = ["hatchling>=1.5.0", "jupyterlab>=4.0.0,<5", "hatch-nodejs-version>=0.3.2"]
+requires = ["hatchling>=1.5.0"]
 build-backend = "hatchling.build"
 
 [project]
-name = "jupyterlab_jupyterbook_navigation"
-readme = "README.md"
-license = { file = "LICENSE" }
-requires-python = ">=3.8"
-classifiers = [
-    "Framework :: Jupyter",
-    "Framework :: Jupyter :: JupyterLab",
-    "Framework :: Jupyter :: JupyterLab :: 4",
-    "Framework :: Jupyter :: JupyterLab :: Extensions",
-    "Framework :: Jupyter :: JupyterLab :: Extensions :: Prebuilt",
-    "License :: OSI Approved :: BSD License",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-]
-dependencies = [
-    "jupyter-server-globbing",
-]
-dynamic = ["version", "description", "authors", "urls", "keywords"]
+name = "jb_toc_frontend"
 
-[tool.hatch.version]
-source = "nodejs"
-
-[tool.hatch.metadata.hooks.nodejs]
-fields = ["description", "authors", "urls"]
-
-[tool.hatch.build.targets.sdist]
-artifacts = ["jupyterlab_jupyterbook_navigation/labextension"]
-exclude = [".github", "binder"]
-
-[tool.hatch.build.targets.wheel.shared-data]
-"jupyterlab_jupyterbook_navigation/labextension" = "share/jupyter/labextensions/jupyterlab-jupyterbook-navigation"
-"install.json" = "share/jupyter/labextensions/jupyterlab-jupyterbook-navigation/install.json"
-
-[tool.hatch.build.hooks.version]
-path = "jupyterlab_jupyterbook_navigation/_version.py"
-
-[tool.hatch.build.hooks.jupyter-builder]
-dependencies = ["hatch-jupyter-builder>=0.5"]
-build-function = "hatch_jupyter_builder.npm_builder"
-ensured-targets = [
-    "jupyterlab_jupyterbook_navigation/labextension/static/style.js",
-    "jupyterlab_jupyterbook_navigation/labextension/package.json",
-]
-skip-if-exists = ["jupyterlab_jupyterbook_navigation/labextension/static/style.js"]
-
-[tool.hatch.build.hooks.jupyter-builder.build-kwargs]
-build_cmd = "build:prod"
-npm = ["jlpm"]
-
-[tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
-build_cmd = "install:extension"
-npm = ["jlpm"]
-source_dir = "src"
-build_dir = "jupyterlab_jupyterbook_navigation/labextension"
+# Source of truth for both jb_toc and jb_toc_frontend packages: 
+# All pyproject.toml and package.json files will be synched to this version.
+# Set here prior to release.
+version = "2.0.0"
 
 [tool.jupyter-releaser.options]
-version_cmd = "hatch version"
+version_cmd  = 'bash -lc "python \"$(git rev-parse --show-toplevel)/scripts/sync_version.py\" --version $0"'
+npm_command = 'bash -lc "jlpm --cwd \"$(git rev-parse --show-toplevel)/jb_toc_frontend\" install --immutable && jlpm --cwd \"$(git rev-parse --show-toplevel)/jb_toc_frontend\" build:prod"'
+python_packages = ["jb_toc_frontend", "jb_toc"]
+changelog_path = "CHANGELOG.md"
 
 [tool.jupyter-releaser.hooks]
-before-build-npm = [
-    "python -m pip install 'jupyterlab>=4.0.0,<5'",
-    "jlpm",
-    "jlpm build:prod"
+before-build-python = [
+  "python scripts/sync_version.py",
+  "echo synching version with before-build-python",
+  'bash -lc "cd \"$(git rev-parse --show-toplevel)/jb_toc_frontend\" && jlpm clean:all"'
 ]
-before-build-python = ["jlpm clean:all"]
+before-build-npm = [
+  "python -m pip install 'jupyterlab>=4.0.0,<5'",
+  "python scripts/sync_version.py",
+  "echo synching version with before-build-npm",
+  'bash -lc "cd \"$(git rev-parse --show-toplevel)/jb_toc_frontend\" && jlpm install --immutable"',
+  'bash -lc "cd \"$(git rev-parse --show-toplevel)/jb_toc_frontend\" && jlpm build:prod"'
+]
+before-build-changelog = [
+    "python scripts/sync_version.py",
+    "echo synching version with before-build-changelog"
+    ]
+before-bump-version = [
+  'bash -lc "echo synching version with before-bump-version"',
+  'bash -lc "pwd"',
+  'bash -lc "python \"$(git rev-parse --show-toplevel)/scripts/sync_version.py\""'
+]
+after-build-python = [
+  # jb_toc_frontend is a dependency of jb_toc (with version parity), so we install from 
+  # local wheels during GitHub Actions
 
-[tool.check-wheel-contents]
-ignore = ["W002"]
+  "python scripts/install_local_wheels.py"
+]

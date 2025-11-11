@@ -1,0 +1,82 @@
+[build-system]
+requires = [
+    "hatchling>=1.27.0", 
+    "hatch-nodejs-version>=0.3.2",
+    "jupyterlab>=4.0.0,<5"
+    ]
+build-backend = "hatchling.build"
+
+[project]
+name = "jb_toc_frontend"
+
+# This version is synced with jb-toc/pyproject.toml during release.
+# Do not manually set.
+version = "0.0.0"
+
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+
+classifiers = [
+    "Framework :: Jupyter",
+    "Framework :: Jupyter :: JupyterLab",
+    "Framework :: Jupyter :: JupyterLab :: 4",
+    "Framework :: Jupyter :: JupyterLab :: Extensions",
+    "Framework :: Jupyter :: JupyterLab :: Extensions :: Prebuilt",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = []
+
+description = "Frontend Jupyter Lab extension providing Jupyter Book Table of Contents in Jupyter Lab"
+keywords = ["jupyter", "jupyterlab", "toc", "jupyter_book"]
+
+[tool.hatch.version]
+source = "nodejs"
+
+[tool.hatch.build.targets.sdist]
+artifacts = ["jb_toc_frontend/labextension"]
+exclude = [".github", "binder"]
+
+[tool.hatch.build.targets.wheel]
+exclude = ["jb_toc_frontend/labextension/**"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"jb_toc_frontend/labextension" = "share/jupyter/labextensions/jb-toc-frontend"
+"jb_toc_frontend/labextension/package.json" = "share/jupyter/labextensions/jb-toc-frontend/package.json"
+"install.json" = "share/jupyter/labextensions/jb-toc-frontend/install.json"
+
+[tool.hatch.build.hooks.jupyter-builder]
+dependencies = ["hatch-jupyter-builder>=0.5"]
+build-function = "hatch_jupyter_builder.npm_builder"
+ensured-targets = [
+    "jb_toc_frontend/labextension/static/style.js",
+    "jb_toc_frontend/labextension/package.json",
+]
+skip-if-exists = ["jb_toc_frontend/labextension/static/style.js"]
+
+[tool.hatch.build.hooks.jupyter-builder.build-kwargs]
+build_cmd = "build:prod"
+npm = ["jlpm"]
+
+[tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
+build_cmd = "install:extension"
+npm = ["jlpm"]
+source_dir = "src"
+build_dir = "jb_toc_frontend/labextension"
+
+[tool.jupyter-releaser.hooks]
+before-build-npm = [
+    "python -m pip install 'jupyterlab>=4.0.0,<5'",
+    "jlpm",
+    "jlpm build:prod"
+]
+before-build-python = ["jlpm clean:all"]
+
+[tool.check-wheel-contents]
+ignore = ["W002"]
