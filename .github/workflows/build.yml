@@ -96,14 +96,14 @@ jobs:
         jupyter server extension list 2>&1 | grep -i "jb_toc.*enabled"
         jupyter labextension list   2>&1 | grep -i "jb-toc-frontend.*OK"
 
-    - name: Upload extension jb_toc_frontend packages
+    - name: Upload jb_toc_frontend dists
       uses: actions/upload-artifact@v4
       with:
         name: jb_toc_frontend-artifacts
         path: jb_toc_frontend/dist/jb_toc_frontend*
         if-no-files-found: error
 
-    - name: Upload extension jb_toc packages
+    - name: Upload jb_toc dists
       uses: actions/upload-artifact@v4
       with:
         name: jb_toc-artifacts
@@ -113,50 +113,39 @@ jobs:
   test_isolated:
     needs: build
     runs-on: ubuntu-latest
-
     steps:
-    - name: Install jb_toc_frontend Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-        architecture: 'x64'
-    - uses: actions/download-artifact@v4
-      with:
-        name: jb_toc_frontend-artifacts
-    - name: Install and Test
-      run: |
-        set -eux
-        # Remove NodeJS, twice to take care of system and locally installed node versions.
-        sudo rm -rf $(which node)
-        sudo rm -rf $(which node)
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          architecture: 'x64'
 
-        pip install "jupyterlab>=4.0.0,<5" jb_toc_frontend*.whl
+      - name: Download frontend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: jb_toc_frontend-artifacts
+          path: wheels
 
-        jupyter labextension list
-        jupyter labextension list 2>&1 | grep -ie "jb-toc-frontend.*OK"
-        python -m jupyterlab.browser_check --no-browser-test
+      - name: Download backend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: jb_toc-artifacts
+          path: wheels
 
-    steps:
-    - name: Install jb_toc Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-        architecture: 'x64'
-    - uses: actions/download-artifact@v4
-      with:
-        name: jb_toc-artifacts
-    - name: Install and Test
-      run: |
-        set -eux
-        # Remove NodeJS, twice to take care of system and locally installed node versions.
-        sudo rm -rf $(which node)
-        sudo rm -rf $(which node)
+      - name: Install and test both
+        run: |
+          set -eux
+          # Make sure we don't accidentally use Node during browser_check
+          sudo rm -f "$(which node)" || true
+          sudo rm -f "$(which node)" || true
 
-        pip install "jupyterlab>=4.0.0,<5" jb_toc*.whl
+          pip install "jupyterlab>=4.0.0,<5" wheels/jb_toc_frontend-*.whl wheels/jb_toc-*.whl
 
-        jupyter labextension list
-        jupyter labextension list 2>&1 | grep -ie "jb-toc.*OK"
-        python -m jupyterlab.browser_check --no-browser-test
+          jupyter labextension list
+          jupyter labextension list 2>&1 | grep -ie "jb-toc-frontend.*OK"
+          jupyter server extension list 2>&1 | grep -ie "jb_toc.*enabled"
+
+          python -m jupyterlab.browser_check --no-browser-test
 
   integration-tests:
     name: Integration tests
