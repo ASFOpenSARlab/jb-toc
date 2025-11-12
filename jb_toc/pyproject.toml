@@ -10,7 +10,7 @@ requires-python = ">=3.10"
 
 # This version is synced with jb-toc/pyproject.toml during release.
 # Do not manually set.
-version = "0.0.0"
+version = "2.0.0"
 
 classifiers = [
     "Framework :: Jupyter",
@@ -29,7 +29,7 @@ classifiers = [
 dependencies = [
     "jupyter-server>=2.0.0",
     "jupyter-server-globbing",
-    "jb-toc-frontend==0.0.0",
+    "jb-toc-frontend==2.0.0",
     ]
 description = "Server extension providing /jbtoc/titles for jb_toc_frontend, if Jupyter Server is available."
 keywords = ["jupyter", "jupyterlab", "toc", "jupyter_book"]

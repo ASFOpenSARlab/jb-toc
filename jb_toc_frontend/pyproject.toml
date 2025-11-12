@@ -11,7 +11,7 @@ name = "jb-toc-frontend"
 
 # This version is synced with jb-toc/pyproject.toml during release.
 # Do not manually set.
-version = "0.0.0"
+version = "2.0.0"
 
 readme = "README.md"
 license = { file = "LICENSE" }

@@ -2,6 +2,12 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 2.0.0
+
+No merged PRs
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 1.0.4
 
 ([Full Changelog](https://github.com/ASFOpenSARlab/jupyterlab-jupyterbook-navigation/compare/v1.0.3...318e0ab2350900daade474de8ca1296126362943))
@@ -15,8 +21,6 @@
 ([GitHub contributors page for this release](https://github.com/ASFOpenSARlab/jupyterlab-jupyterbook-navigation/graphs/contributors?from=2025-03-22&to=2025-03-22&type=c))
 
 [@Alex-Lewandowski](https://github.com/search?q=repo%3AASFOpenSARlab%2Fjupyterlab-jupyterbook-navigation+involves%3AAlex-Lewandowski+updated%3A2025-03-22..2025-03-22&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 1.0.3
 
