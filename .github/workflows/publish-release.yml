@@ -5,12 +5,9 @@ on:
       branch:
         description: "The target branch"
         required: false
-      release_url:
-        description: "The URL of the draft GitHub release"
-        required: false
       tag:
         description: "Tag name of the draft release (e.g., v0.0.0)"
-        required: false
+        required: true
 
 jobs:
   publish_release:
@@ -26,49 +23,13 @@ jobs:
         
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
 
-      - name: Normalize draft release URL
-        id: norm
-        env:
-          GH_TOKEN: ${{ secrets.PUBLISH_GITHUB_PAT }}
-          INPUT_URL: ${{ github.event.inputs.release_url }}
-          INPUT_TAG: ${{ github.event.inputs.tag }}
-          REPO: ${{ github.repository }}
-        run: |
-          set -euo pipefail
-          pick_by_tag () {
-            local id
-            id=$(gh api "repos/${REPO}/releases" \
-              --jq ".[] | select(.draft == true and .tag_name == \"${INPUT_TAG}\") | .id")
-            [[ -n "${id}" ]] || { echo "No draft found for tag ${INPUT_TAG}" >&2; exit 1; }
-            echo "https://github.com/${REPO}/releases/edit/${id}"
-          }
-
-          # Helper to pick the most recently updated draft (fallback)
-          pick_latest_draft () {
-            local id
-            id=$(gh api "repos/${REPO}/releases" \
-              --jq "[.[] | select(.draft == true)] | sort_by(.updated_at) | last | .id")
-            [[ -n "${id}" && "${id}" != "null" ]] || { echo "No draft release found" >&2; exit 1; }
-            echo "https://github.com/${REPO}/releases/edit/${id}"
-          }
-
-          url="${INPUT_URL:-}"
-          if [[ -n "${INPUT_TAG}" ]]; then
-            url="$(pick_by_tag)"
-          elif [[ -z "${url}" || "${url}" == *"/releases/edit/untagged-"* ]]; then
-            url="$(pick_latest_draft)"
-          fi
-
-          echo "url=${url}" >> "$GITHUB_OUTPUT"
-          echo "Using draft: ${url}"
-
       - name: Populate Release
         id: populate-release
         uses: jupyter-server/jupyter_releaser/.github/actions/populate-release@v2
         with:
           token: ${{ secrets.PUBLISH_GITHUB_PAT }}
           branch: ${{ github.event.inputs.branch }}
-          release_url: ${{ steps.norm.outputs.url }}
+          release_url: https://github.com/${{ github.repository }}/releases/tag/${{ github.event.inputs.tag }}
           steps_to_skip: check-python
 
       - name: Finalize Release
