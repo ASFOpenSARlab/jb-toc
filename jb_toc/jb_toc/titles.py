@@ -1,7 +1,9 @@
 from __future__ import annotations
 import os, re
-from typing import Dict, Any
+from typing import Dict, Any, List
 from jupyter_server.utils import ensure_async
+from jupyter_server.services.contents.manager import ContentsManager
+
 
 
 def _title_from_markdown(md_text: str) -> str | None:
@@ -46,7 +48,16 @@ def _title_from_notebook(notebook: Dict[str, Any]) -> str | None:
                 return title
     return None
 
-async def get_titles(paths, cm):
+async def get_titles(paths: List[str], cm: ContentsManager):
+    """
+    Iterates through a list of paths contained in a ContentsManager,
+    opens each notebook and file, and extracts the first encountered 
+    Markdown header as a title.
+
+    paths: list of paths to files in the ContentsManager
+    cm: ContentsManager containing the file structure of the Jupyter Book
+    returns: A dict mapping paths to titles
+    """
     out: Dict[str, Dict[str, str]] = {}
     for p in paths:
         try:
@@ -64,7 +75,7 @@ async def get_titles(paths, cm):
                     title = _title_from_markdown(head)
             if not title:
                 title = os.path.splitext(os.path.basename(p))[0]
-            out[p] = {"title": title}
+            out[p] = title
         except Exception as e:
-            out[p] = {"title": f"File not found: {p}"}
+            out[p] = f"File not found: {p}"
     return out
