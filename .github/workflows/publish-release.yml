@@ -8,6 +8,9 @@ on:
       release_url:
         description: "The URL of the draft GitHub release"
         required: false
+      tag:
+        description: "Tag name of the draft release (e.g., v0.0.0)"
+        required: false
 
 jobs:
   publish_release:
