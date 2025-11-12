@@ -12,6 +12,9 @@ on:
         description: "Use PRs with activity since the last stable git tag"
         required: false
         type: boolean
+      steps_to_skip:
+        description: "Comma separated list of steps to skip"
+        required: false
 
 jobs:
   prep_release:
@@ -29,11 +32,14 @@ jobs:
           since: ${{ github.event.inputs.since }}
           since_last_stable: ${{ github.event.inputs.since_last_stable }}
 
-      - name: Build Release (attach artifacts to draft release)
-        uses: jupyter-server/jupyter_releaser/.github/actions/build-release@v2
+      - name: Populate Release
+        id: populate
+        uses: jupyter-server/jupyter_releaser/.github/actions/populate-release@v2
         with:
           token: ${{ secrets.PUBLISH_GITHUB_PAT }}
-          release_url: ${{ steps.prep.outputs.release_url }}
+          branch: ${{ github.event.inputs.branch }}
+          release_url: ${{ github.event.inputs.release_url }}
+          steps_to_skip: ${{ github.event.inputs.steps_to_skip }}
 
       - name: "** Next Step **"
         run: |
@@ -42,4 +48,4 @@ jobs:
           echo "${{ steps.prep.outputs.release_url }}"
           echo ""
           echo "Trigger the 'Publish Release' workflow with:"
-          echo "  release_url=${{ steps.prep.outputs.release_url }}"      
+          echo "  release_url=${{ steps.populate.outputs.release_url }}"      
