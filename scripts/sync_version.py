@@ -63,7 +63,7 @@ def ensure_project_version(pyproj_text: str, pep440_version: str) -> str:
 
 def ensure_project_dep(pyproj_text: str, pep440_version: str) -> str:
     """
-    Update jb_toc_frontend dependency version in jb_toc/pyproject.toml
+    Update jb-toc-frontend dependency version in jb_toc/pyproject.toml
     """
     m = PROJECT_TABLE_RE.search(pyproj_text)
  

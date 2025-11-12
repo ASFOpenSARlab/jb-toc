@@ -1,4 +1,4 @@
-# jb_toc
+# jb-toc
 
 A JupyterLab extension that provides Jupyter Book navigation in a sidepanel widget with a Jupyter Book table of contents.
 
@@ -8,20 +8,20 @@ A JupyterLab extension that provides Jupyter Book navigation in a sidepanel widg
 
 ## Install
 
-This installs both the `jb_toc` server extension and the `jb_toc_frontend` extension. If you are using JupyterLite and don't need a server extension, you can [install `jb_toc_frontend`](../jb_toc_frontend/README.md) without `jb_toc`.
+This installs both the `jb-toc` server extension and the `jb-toc-frontend` extension. If you are using JupyterLite and don't need a server extension, you can [install `jb-toc-frontend`](../jb_toc_frontend/README.md) without `jb-toc`.
 
-To install `jb_toc`, execute:
+To install `jb-toc`, execute:
 
 ```bash
-python -m pip install jb_toc
+python -m pip install jb-toc
 ```
 
 ## Uninstall
 
-To remove the `jb_toc` extension, execute:
+To remove the `jb-toc` extension, execute:
 
 ```bash
-python -m pip uninstall jb_toc
+python -m pip uninstall jb-toc
 ```
 
 ## Contributing
@@ -40,7 +40,7 @@ python -m pip install -e ./jb_toc
 ### Development uninstall
 
 ```bash
-python -m pip uninstall jb_toc
+python -m pip uninstall jb-toc
 ```
 
 ### Packaging the extension

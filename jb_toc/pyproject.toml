@@ -31,7 +31,7 @@ dependencies = [
     "jupyter-server-globbing",
     "jb-toc-frontend==0.0.0"
     ]
-description = "Server extension providing /jbtoc/titles for jb_toc_frontend, if Jupyter Server is available."
+description = "Server extension providing /jbtoc/titles for jb-toc-frontend, if Jupyter Server is available."
 keywords = ["jupyter", "jupyterlab", "toc", "jupyter_book"]
 
 [project.optional-dependencies]

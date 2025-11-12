@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "jb-toc-frontend"
 
-# Source of truth for both jb_toc and jb_toc_frontend packages: 
+# Source of truth for both jb-toc and jb-toc-frontend packages: 
 # All pyproject.toml and package.json files will be synched to this version.
 # Set here prior to release.
 version = "2.0.0"
@@ -23,7 +23,7 @@ before-build-python = [
   'bash -lc "cd \"$(git rev-parse --show-toplevel)/jb_toc_frontend\" && jlpm clean:all"'
 ]
 after-build-python = [
-  # jb_toc_frontend is a dependency of jb_toc (with version parity), so we install from 
+  # jb-toc-frontend is a dependency of jb-toc (with version parity), so we install from 
   # local wheels during GitHub Actions
   "python scripts/install_local_wheels.py",
   # copy npm tarball to root/dist

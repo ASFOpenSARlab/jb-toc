@@ -34,7 +34,7 @@ jobs:
     - name: Install dependencies
       run: python -m pip install -U "jupyterlab>=4.0.0,<5"
 
-    - name: Cache JS deps (jb_toc_frontend)
+    - name: Cache JS deps (jb-toc-frontend)
       uses: actions/cache@v4
       with:
         path: |
@@ -72,14 +72,14 @@ jobs:
         jupyter labextension list 2>&1 | grep -ie "jb-toc-frontend.*OK"
         python -m jupyterlab.browser_check
 
-    - name: Package the jb_toc_frontend extension
+    - name: Package the jb-toc-frontend extension
       working-directory: jb_toc_frontend
       run: |
         set -eux
         python -m pip install -U build
         python -m build
 
-    - name: Package the jb_toc extension
+    - name: Package the jb-toc extension
       working-directory: jb_toc
       run: |
         set -eux
@@ -96,17 +96,17 @@ jobs:
         jupyter server extension list 2>&1 | grep -i "jb_toc.*enabled"
         jupyter labextension list   2>&1 | grep -i "jb-toc-frontend.*OK"
 
-    - name: Upload jb_toc_frontend dists
+    - name: Upload jb-toc-frontend dists
       uses: actions/upload-artifact@v4
       with:
-        name: jb_toc_frontend-artifacts
+        name: jb-toc-frontend-artifacts
         path: jb_toc_frontend/dist/jb_toc_frontend*
         if-no-files-found: error
 
-    - name: Upload jb_toc dists
+    - name: Upload jb-toc dists
       uses: actions/upload-artifact@v4
       with:
-        name: jb_toc-artifacts
+        name: jb-toc-artifacts
         path: jb_toc/dist/jb_toc*
         if-no-files-found: error
 
@@ -123,13 +123,13 @@ jobs:
       - name: Download frontend artifact
         uses: actions/download-artifact@v4
         with:
-          name: jb_toc_frontend-artifacts
+          name: jb-toc-frontend-artifacts
           path: wheels
 
       - name: Download backend artifact
         uses: actions/download-artifact@v4
         with:
-          name: jb_toc-artifacts
+          name: jb-toc-artifacts
           path: wheels
 
       - name: Install and test both
@@ -173,16 +173,16 @@ jobs:
     - name: Base Setup
       uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
 
-    - name: Download jb_toc_frontend package
+    - name: Download jb-toc-frontend package
       uses: actions/download-artifact@v4
       with:
-        name: jb_toc_frontend-artifacts
+        name: jb-toc-frontend-artifacts
         path: jb_toc_frontend
 
-    - name: Download jb_toc package
+    - name: Download jb-toc package
       uses: actions/download-artifact@v4
       with:
-        name: jb_toc-artifacts
+        name: jb-toc-artifacts
         path: jb_toc
 
     - name: Install the extension
@@ -227,7 +227,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: jb_toc_frontend-playwright-tests
+        name: jb-toc-frontend-playwright-tests
         path: |
           ui-tests/test-results
           ui-tests/playwright-report
