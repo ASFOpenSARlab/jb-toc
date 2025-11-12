@@ -38,9 +38,3 @@ before-bump-version = [
   'bash -lc "pwd"',
   'bash -lc "python \"$(git rev-parse --show-toplevel)/scripts/sync_version.py\""'
 ]
-after-build-python = [
-  # jb_toc_frontend is a dependency of jb_toc (with version parity), so we install from 
-  # local wheels during GitHub Actions
-
-  "python scripts/install_local_wheels.py"
-]
