@@ -34,7 +34,7 @@ jobs:
     - name: Install dependencies
       run: python -m pip install -U "jupyterlab>=4.0.0,<5"
 
-    - name: Cache JS deps (jb_toc_frontend)
+    - name: Cache JS deps (jb-toc-frontend)
       uses: actions/cache@v4
       with:
         path: |
@@ -72,47 +72,82 @@ jobs:
         jupyter labextension list 2>&1 | grep -ie "jb-toc-frontend.*OK"
         python -m jupyterlab.browser_check
 
-    - name: Package the extension
+    - name: Install/Upgrade build tool
+      run: |
+        python -m pip install -U build
+
+    - name: Package the jb-toc-frontend extension
       working-directory: jb_toc_frontend
       run: |
         set -eux
-
-        pip install build
         python -m build
-        pip uninstall -y "jb_toc_frontend" jupyterlab
 
-    - name: Upload extension packages
+    - name: Package the jb-toc extension
+      working-directory: jb_toc
+      run: |
+        set -eux
+        python -m build
+
+    - name: Install both wheels
+      run: |
+        set -eux
+        python -m pip install jb_toc/dist/jb_toc-*.whl
+
+    - name: Verify extensions
+      run: |
+        jupyter server extension list 2>&1 | grep -i "jb_toc.*enabled"
+        jupyter labextension list   2>&1 | grep -i "jb-toc-frontend.*OK"
+
+    - name: Upload jb-toc-frontend dists
       uses: actions/upload-artifact@v4
       with:
-        name: extension-artifacts
+        name: jb-toc-frontend-artifacts
         path: jb_toc_frontend/dist/jb_toc_frontend*
+        if-no-files-found: error
+
+    - name: Upload jb-toc dists
+      uses: actions/upload-artifact@v4
+      with:
+        name: jb-toc-artifacts
+        path: jb_toc/dist/jb_toc*
         if-no-files-found: error
 
   test_isolated:
     needs: build
     runs-on: ubuntu-latest
-
     steps:
-    - name: Install Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-        architecture: 'x64'
-    - uses: actions/download-artifact@v4
-      with:
-        name: extension-artifacts
-    - name: Install and Test
-      run: |
-        set -eux
-        # Remove NodeJS, twice to take care of system and locally installed node versions.
-        sudo rm -rf $(which node)
-        sudo rm -rf $(which node)
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          architecture: 'x64'
 
-        pip install "jupyterlab>=4.0.0,<5" jb_toc_frontend*.whl
+      - name: Download frontend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: jb-toc-frontend-artifacts
+          path: wheels
 
-        jupyter labextension list
-        jupyter labextension list 2>&1 | grep -ie "jb-toc-frontend.*OK"
-        python -m jupyterlab.browser_check --no-browser-test
+      - name: Download backend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: jb-toc-artifacts
+          path: wheels
+
+      - name: Install and test both
+        run: |
+          set -eux
+          # Make sure we don't accidentally use Node during browser_check
+          sudo rm -f "$(which node)" || true
+          sudo rm -f "$(which node)" || true
+
+          pip install "jupyterlab>=4.0.0,<5" wheels/jb_toc_frontend-*.whl wheels/jb_toc-*.whl
+
+          jupyter labextension list
+          jupyter labextension list 2>&1 | grep -ie "jb-toc-frontend.*OK"
+          jupyter server extension list 2>&1 | grep -ie "jb_toc.*enabled"
+
+          python -m jupyterlab.browser_check --no-browser-test
 
   integration-tests:
     name: Integration tests
@@ -140,11 +175,17 @@ jobs:
     - name: Base Setup
       uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
 
-    - name: Download extension package
+    - name: Download jb-toc-frontend package
       uses: actions/download-artifact@v4
       with:
-        name: extension-artifacts
+        name: jb-toc-frontend-artifacts
         path: jb_toc_frontend
+
+    - name: Download jb-toc package
+      uses: actions/download-artifact@v4
+      with:
+        name: jb-toc-artifacts
+        path: jb_toc
 
     - name: Install the extension
       working-directory: jb_toc_frontend
@@ -188,7 +229,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: jb_toc_frontend-playwright-tests
+        name: jb-toc-frontend-playwright-tests
         path: |
           ui-tests/test-results
           ui-tests/playwright-report

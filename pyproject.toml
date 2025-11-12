@@ -3,9 +3,9 @@ requires = ["hatchling>=1.5.0"]
 build-backend = "hatchling.build"
 
 [project]
-name = "jb_toc_frontend"
+name = "jb-toc-frontend"
 
-# Source of truth for both jb_toc and jb_toc_frontend packages: 
+# Source of truth for both jb-toc and jb-toc-frontend packages: 
 # All pyproject.toml and package.json files will be synched to this version.
 # Set here prior to release.
 version = "2.0.0"
@@ -22,6 +22,13 @@ before-build-python = [
   "echo synching version with before-build-python",
   'bash -lc "cd \"$(git rev-parse --show-toplevel)/jb_toc_frontend\" && jlpm clean:all"'
 ]
+after-build-python = [
+  # jb-toc-frontend is a dependency of jb-toc (with version parity), so we install from 
+  # local wheels during GitHub Actions
+  "python scripts/install_local_wheels.py",
+  # copy npm tarball to root/dist
+  "bash -lc 'ROOT=$(git rev-parse --show-toplevel); DIST=\"$ROOT/dist\"; PKG=\"$ROOT/jb_toc_frontend\"; mkdir -p \"$DIST\"; cd \"$PKG\"; npm pack --pack-destination \"$DIST\" --silent; echo \"npm tarball(s) in $DIST:\"; ls -1 \"$DIST\"/*.tgz || true'"
+]
 before-build-npm = [
   "python -m pip install 'jupyterlab>=4.0.0,<5'",
   "python scripts/sync_version.py",
@@ -37,10 +44,4 @@ before-bump-version = [
   'bash -lc "echo synching version with before-bump-version"',
   'bash -lc "pwd"',
   'bash -lc "python \"$(git rev-parse --show-toplevel)/scripts/sync_version.py\""'
-]
-after-build-python = [
-  # jb_toc_frontend is a dependency of jb_toc (with version parity), so we install from 
-  # local wheels during GitHub Actions
-
-  "python scripts/install_local_wheels.py"
 ]
