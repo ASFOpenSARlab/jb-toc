@@ -72,20 +72,42 @@ jobs:
         jupyter labextension list 2>&1 | grep -ie "jb-toc-frontend.*OK"
         python -m jupyterlab.browser_check
 
-    - name: Package the extension
+    - name: Package the jb_toc_frontend extension
       working-directory: jb_toc_frontend
       run: |
         set -eux
-
-        pip install build
+        python -m pip install -U build
         python -m build
-        pip uninstall -y "jb_toc_frontend" jupyterlab
 
-    - name: Upload extension packages
+    - name: Package the jb_toc extension
+      working-directory: jb_toc
+      run: |
+        set -eux
+        python -m pip install -U build
+        python -m build
+
+    - name: Install both wheels (no deps)
+      run: |
+        set -eux
+        pip install --no-deps jb_toc_frontend/dist/jb_toc_frontend-*.whl jb_toc/dist/jb_toc-*.whl
+
+    - name: Verify extensions
+      run: |
+        jupyter server extension list 2>&1 | grep -i "jb_toc.*enabled"
+        jupyter labextension list   2>&1 | grep -i "jb-toc-frontend.*OK"
+
+    - name: Upload extension jb_toc_frontend packages
       uses: actions/upload-artifact@v4
       with:
         name: extension-artifacts
         path: jb_toc_frontend/dist/jb_toc_frontend*
+        if-no-files-found: error
+
+    - name: Upload extension jb_toc packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: extension-artifacts
+        path: jb_toc/dist/jb_toc*
         if-no-files-found: error
 
   test_isolated:
