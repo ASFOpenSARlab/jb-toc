@@ -36,7 +36,7 @@ jobs:
           token: ${{ secrets.PUBLISH_GITHUB_PAT }}
           branch: ${{ github.event.inputs.branch }}
           release_url: ${{ github.event.inputs.release_url }}
-          steps_to_skip: check-python
+          steps_to_skip: tag-release,check-python
 
       - name: Smoke test wheels (no deps)
         run: |
