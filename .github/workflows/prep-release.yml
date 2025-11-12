@@ -12,9 +12,6 @@ on:
         description: "Use PRs with activity since the last stable git tag"
         required: false
         type: boolean
-      steps_to_skip:
-        description: "Comma separated list of steps to skip"
-        required: false
 
 jobs:
   prep_release:
@@ -39,10 +36,16 @@ jobs:
           token: ${{ secrets.PUBLISH_GITHUB_PAT }}
           branch: ${{ github.event.inputs.branch }}
           release_url: ${{ github.event.inputs.release_url }}
-          steps_to_skip: ${{ github.event.inputs.steps_to_skip }}
+          steps_to_skip: check-python
+
+      - name: Install jupyter-releaser
+        run: python -m pip install -U jupyter-releaser
+        
+      - name: Check Python dists (no deps)
+        run: |
+          jupyter-releaser check-python
         env:
-          PIP_NO_INDEX: "1"
-          PIP_FIND_LINKS: "file://${{ github.workspace }}/dist"
+          PIP_NO_DEPS: "1"
 
       - name: "** Next Step **"
         run: |
