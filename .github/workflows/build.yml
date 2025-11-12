@@ -86,7 +86,7 @@ jobs:
         python -m pip install -U build
         python -m build
 
-    - name: Install both wheels (no deps)
+    - name: Install both wheels
       run: |
         set -eux
         python -m pip install jb_toc/dist/jb_toc-*.whl
