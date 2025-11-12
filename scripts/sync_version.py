@@ -12,7 +12,7 @@ SEMVER = re.compile(
 
 PROJECT_TABLE_RE = re.compile(r'(?ms)^\[project\]\s*(?P<body>.*?)(?=^\[[^\]]+\]|\Z)')
 VERSION_LINE_RE = re.compile(r'(?m)^\s*version\s*=\s*([\'"])(?P<ver>.*?)(\1)\s*$')
-FRONTEND_DEP_RE = re.compile(r'(?m)^[ \t]*"jb_toc_frontend\s*==\s*(?P<ver>[^"]+)"[ \t]*,?$')
+FRONTEND_DEP_RE = re.compile(r'(?m)^[ \t]*"jb-toc-frontend\s*==\s*(?P<ver>[^"]+)"[ \t]*,?$')
 
 def npm_to_pep440(v: str) -> str:
     m = SEMVER.match(v or "")
@@ -71,11 +71,11 @@ def ensure_project_dep(pyproj_text: str, pep440_version: str) -> str:
     body = m.group('body')
 
     if FRONTEND_DEP_RE.search(body):
-        body = FRONTEND_DEP_RE.sub(f'    "jb_toc_frontend=={pep440_version}"\n', body, count=1)
+        body = FRONTEND_DEP_RE.sub(f'    "jb-toc-frontend=={pep440_version}",', body, count=1)
     else:
         if body and not body.startswith("\n"):
             body = "\n" + body
-        body = f'\n    "jb_toc_frontend=={pep440_version}"\n{body}'
+        body = f'\n    "jb-toc-frontend=={pep440_version}"\n{body}'
 
     new_project_block = f"[project]\n{body}"
     return pyproj_text[:start] + new_project_block + pyproj_text[end:]
@@ -121,7 +121,6 @@ def main():
     ]
     package_json_paths = [
         root / "jb_toc_frontend/package.json",
-        root / "jb_toc/package.json",
     ]
 
     data = root_pyproject.read_text(encoding="utf-8")

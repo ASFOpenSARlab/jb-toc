@@ -11,7 +11,6 @@ name = "jb-toc-frontend"
 version = "2.0.0"
 
 [tool.jupyter-releaser.options]
-version_spec = "major"
 version_cmd  = 'bash -lc "python \"$(git rev-parse --show-toplevel)/scripts/sync_version.py\" --version $0"'
 npm_command = 'bash -lc "jlpm --cwd \"$(git rev-parse --show-toplevel)/jb_toc_frontend\" install --immutable && jlpm --cwd \"$(git rev-parse --show-toplevel)/jb_toc_frontend\" build:prod"'
 python_packages = ["jb_toc_frontend", "jb_toc"]
@@ -22,6 +21,13 @@ before-build-python = [
   "python scripts/sync_version.py",
   "echo synching version with before-build-python",
   'bash -lc "cd \"$(git rev-parse --show-toplevel)/jb_toc_frontend\" && jlpm clean:all"'
+]
+after-build-python = [
+  # jb_toc_frontend is a dependency of jb_toc (with version parity), so we install from 
+  # local wheels during GitHub Actions
+  "python scripts/install_local_wheels.py",
+  # copy npm tarball to root/dist
+  "bash -lc 'ROOT=$(git rev-parse --show-toplevel); DIST=\"$ROOT/dist\"; PKG=\"$ROOT/jb_toc_frontend\"; mkdir -p \"$DIST\"; cd \"$PKG\"; npm pack --pack-destination \"$DIST\" --silent; echo \"npm tarball(s) in $DIST:\"; ls -1 \"$DIST\"/*.tgz || true'"
 ]
 before-build-npm = [
   "python -m pip install 'jupyterlab>=4.0.0,<5'",
@@ -38,10 +44,4 @@ before-bump-version = [
   'bash -lc "echo synching version with before-bump-version"',
   'bash -lc "pwd"',
   'bash -lc "python \"$(git rev-parse --show-toplevel)/scripts/sync_version.py\""'
-]
-after-build-python = [
-  # jb_toc_frontend is a dependency of jb_toc (with version parity), so we install from 
-  # local wheels during GitHub Actions
-
-  "python scripts/install_local_wheels.py"
 ]

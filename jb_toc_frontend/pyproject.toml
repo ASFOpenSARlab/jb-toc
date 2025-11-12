@@ -7,7 +7,7 @@ requires = [
 build-backend = "hatchling.build"
 
 [project]
-name = "jb_toc_frontend"
+name = "jb-toc-frontend"
 
 # This version is synced with jb-toc/pyproject.toml during release.
 # Do not manually set.
