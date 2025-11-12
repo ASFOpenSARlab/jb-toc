@@ -3,7 +3,7 @@ requires = ["hatchling>=1.5.0"]
 build-backend = "hatchling.build"
 
 [project]
-name = "jb_toc_frontend"
+name = "jb-toc-frontend"
 
 # Source of truth for both jb_toc and jb_toc_frontend packages: 
 # All pyproject.toml and package.json files will be synched to this version.
