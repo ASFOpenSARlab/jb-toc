@@ -89,7 +89,7 @@ jobs:
     - name: Install both wheels (no deps)
       run: |
         set -eux
-        pip install --no-deps jb_toc_frontend/dist/jb_toc_frontend-*.whl jb_toc/dist/jb_toc-*.whl
+        python -m pip install jb_toc/dist/jb_toc-*.whl
 
     - name: Verify extensions
       run: |
@@ -99,14 +99,14 @@ jobs:
     - name: Upload extension jb_toc_frontend packages
       uses: actions/upload-artifact@v4
       with:
-        name: extension-artifacts
+        name: jb_toc_frontend-artifacts
         path: jb_toc_frontend/dist/jb_toc_frontend*
         if-no-files-found: error
 
     - name: Upload extension jb_toc packages
       uses: actions/upload-artifact@v4
       with:
-        name: extension-artifacts
+        name: jb_toc-artifacts
         path: jb_toc/dist/jb_toc*
         if-no-files-found: error
 
