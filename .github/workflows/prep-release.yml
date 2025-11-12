@@ -20,6 +20,9 @@ jobs:
   prep_release:
     runs-on: ubuntu-latest
     environment: publishing
+    env:
+      PIP_NO_INDEX: "1"
+      PIP_FIND_LINKS: "dist"
     steps:
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
 
