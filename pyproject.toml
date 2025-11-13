@@ -8,7 +8,7 @@ name = "jb-toc-frontend"
 # Source of truth for both jb-toc and jb-toc-frontend packages: 
 # All pyproject.toml and package.json files will be synched to this version.
 # Set here prior to release.
-version = "2.0.0dev"
+version = "2.0.0-dev"
 
 [tool.jupyter-releaser.options]
 version_cmd  = 'bash -lc "python \"$(git rev-parse --show-toplevel)/scripts/sync_version.py\" --version $0"'
