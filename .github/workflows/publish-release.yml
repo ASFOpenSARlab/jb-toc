@@ -5,9 +5,13 @@ on:
       branch:
         description: "The target branch"
         required: false
+        default: "main"
       release_url:
         description: "The URL of the draft GitHub release"
         required: false
+      tag:
+        description: "Release tag (e.g., v0.0.0)"
+        required: true
 
 jobs:
   publish_release:
@@ -17,11 +21,29 @@ jobs:
       # This is useful if you want to use PyPI trusted publisher
       # and NPM provenance
       id-token: write
+      contents: write
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
         
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+
+      - name: Release tag
+        env:
+          TAG: ${{ github.event.inputs.tag }}
+          BRANCH: ${{ github.event.inputs.branch }}
+        run: |
+          set -euxo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin "${BRANCH}" --depth=1
+          git checkout -B "${BRANCH}" "origin/${BRANCH}"
+          git tag -f "${TAG}"
+          git push origin "refs/tags/${TAG}" --force
 
       - name: Populate Release
         id: populate-release
@@ -30,7 +52,7 @@ jobs:
           token: ${{ secrets.PUBLISH_GITHUB_PAT }}
           branch: ${{ github.event.inputs.branch }}
           release_url: ${{ github.event.inputs.release_url }}
-          steps_to_skip: check-python
+          steps_to_skip: check-python,tag-release
 
       - name: Finalize Release
         id: finalize-release
