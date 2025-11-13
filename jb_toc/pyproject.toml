@@ -34,6 +34,11 @@ dependencies = [
 description = "Server extension providing /jbtoc/titles for jb-toc-frontend, if Jupyter Server is available."
 keywords = ["jupyter", "jupyterlab", "toc", "jupyter_book"]
 
+[project.urls]
+Homepage = "https://github.com/ASFOpenSARlab/jb-toc"
+Repository = "https://github.com/ASFOpenSARlab/jb-toc"
+Issues = "https://github.com/ASFOpenSARlab/jb-toc/issues"
+
 [project.optional-dependencies]
 test = [
     "coverage",

@@ -36,6 +36,11 @@ dependencies = []
 description = "Frontend Jupyter Lab extension providing Jupyter Book Table of Contents in Jupyter Lab"
 keywords = ["jupyter", "jupyterlab", "toc", "jupyter_book"]
 
+[project.urls]
+Homepage = "https://github.com/ASFOpenSARlab/jb-toc"
+Repository = "https://github.com/ASFOpenSARlab/jb-toc"
+Issues = "https://github.com/ASFOpenSARlab/jb-toc/issues"
+
 [tool.hatch.version]
 source = "nodejs"
 
