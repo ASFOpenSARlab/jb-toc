@@ -2,9 +2,6 @@ name: "Step 1: Prep Release"
 on:
   workflow_dispatch:
     inputs:
-      tag:
-        description: "Release tag (e.g., v0.0.0)"
-        required: true
       branch:
         description: "The branch to target"
         required: false
@@ -38,20 +35,6 @@ jobs:
           since: ${{ github.event.inputs.since }}
           since_last_stable: ${{ github.event.inputs.since_last_stable }}
 
-      - name: Force-create/move tag on remote
-        env:
-          TAG: ${{ github.event.inputs.tag }}
-          BRANCH: ${{ github.event.inputs.branch }}
-        run: |
-          set -euxo pipefail
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin "${BRANCH}" --depth=1
-          git checkout -B "${BRANCH}" "origin/${BRANCH}"
-          git tag -f "${TAG}"
-          git push origin "refs/tags/${TAG}" --force
-
       - name: "** Next Step **"
         run: |
-          echo "Tag pushed: ${{ github.event.inputs.tag }}"
           echo "Optional): Review Draft Release: ${{ steps.prep-release.outputs.release_url }}"

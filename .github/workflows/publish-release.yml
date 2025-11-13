@@ -5,9 +5,9 @@ on:
       branch:
         description: "The target branch"
         required: false
-      tag:
-        description: "Tag name of the draft release (e.g., v0.0.0)"
-        required: true
+      release_url:
+        description: "The URL of the draft GitHub release"
+        required: false
 
 jobs:
   publish_release:
@@ -29,7 +29,7 @@ jobs:
         with:
           token: ${{ secrets.PUBLISH_GITHUB_PAT }}
           branch: ${{ github.event.inputs.branch }}
-          release_url: https://github.com/${{ github.repository }}/releases/tag/${{ github.event.inputs.tag }}
+          release_url: ${{ github.event.inputs.release_url }}
           steps_to_skip: check-python
 
       - name: Finalize Release
