@@ -1,6 +1,19 @@
 # Changelog
 
 <!-- <START NEW CHANGELOG ENTRY> -->
+## 2.0.1
+
+### Enhancements made
+
+- Add repository URLs to project metadata [#40](https://github.com/ASFOpenSARlab/jb-toc/pull/40) ([@ktaletsk](https://github.com/ktaletsk))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/ASFOpenSARlab/jb-toc/graphs/contributors?from=2025-11-13&to=2025-12-08&type=c))
+
+[@ktaletsk](https://github.com/search?q=repo%3AASFOpenSARlab%2Fjb-toc+involves%3Aktaletsk+updated%3A2025-11-13..2025-12-08&type=Issues)
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 2.0.0
 
 ### Enhancements made
@@ -14,7 +27,6 @@
 - Splits Jupyter Book 1 and Jupyter Book 2 logic into separate TS modules
 - Updates actions to support monorepo architecture
 
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 1.0.4
 
